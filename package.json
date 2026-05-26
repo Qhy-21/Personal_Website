@@ -1,0 +1,19 @@
+{
+  "name": "xianghuayin-personal-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "羌花吟の个人网站 · 像素风个人主页（静态站点，可直接用浏览器打开 index.html）",
+  "scripts": {
+    "start": "echo \"这是一个纯静态页面项目，直接用浏览器打开 index.html 即可预览。\""
+  },
+  "keywords": [
+    "personal-site",
+    "pixel-art",
+    "portfolio",
+    "xianghuayin"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
+
