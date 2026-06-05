@@ -1,14 +1,19 @@
 {
-  "name": "qhy-personal-site",
-  "version": "2.0.0",
+  "name": "qhy-frontend",
+  "version": "1.0.0",
   "private": true,
-  "description": "羌花吟の个人网站 · Vue 3 + Vite 全栈式个人主页",
+  "type": "module",
   "scripts": {
-    "dev": "cd frontend && npm run dev",
-    "build": "cd frontend && npm run build",
-    "install:all": "cd frontend && npm install"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": ["personal-site", "pixel-art", "portfolio", "xianghuayin"],
-  "author": "",
-  "license": "MIT"
+  "dependencies": {
+    "vue": "^3.4.0",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.4.0"
+  }
 }
