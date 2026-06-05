@@ -1,0 +1,58 @@
+const mlCards = [
+  { title: '🌲 机器学习基础', open: true,
+    topics: [
+      '<strong>监督学习 vs 无监督学习 vs 强化学习</strong> —— 三者的定义、区别与典型应用场景',
+      '<strong>过拟合与欠拟合</strong> —— Bias-Variance Tradeoff，正则化（L1/L2）',
+      '<strong>损失函数</strong> —— MSE、交叉熵、Hinge Loss 的适用场景',
+      '<strong>梯度下降</strong> —— Batch GD、SGD、Mini-Batch GD、Momentum、Adam',
+      '<strong>交叉验证</strong> —— K-Fold、留一法、分层采样',
+    ] },
+  { title: '📊 监督学习', open: true,
+    topics: [
+      '<strong>线性回归 & 逻辑回归</strong> —— 最小二乘、Sigmoid 函数、决策边界',
+      '<strong>决策树</strong> —— ID3、C4.5、CART，信息增益与 Gini 系数',
+      '<strong>集成学习</strong> —— Bagging（Random Forest）、Boosting（AdaBoost、XGBoost）',
+      '<strong>支持向量机 (SVM)</strong> —— 最大间隔、核函数（RBF）、软间隔',
+      '<strong>KNN</strong> —— 距离度量、K 值选择、KD-Tree',
+      '<strong>朴素贝叶斯</strong> —— 条件概率假设、拉普拉斯平滑',
+    ] },
+  { title: '🔬 动手实践', open: true,
+    topics: [
+      '<strong>KNN 分类器</strong> —— 不依赖 sklearn，Python 实现欧氏距离、k 近邻投票',
+      '<strong>电影分类</strong> —— 根据打斗/唯美镜头数判断电影类型（文艺片 vs 动作片）',
+      '<strong>Iris 数据集决策树</strong> —— 鸢尾花三分类 + 决策树可视化（plot_tree）',
+      '<strong>波士顿房价回归</strong> —— 线性回归预测房价，分析各特征权重',
+      '<strong>逻辑回归实验</strong> —— 社交网络广告数据集，对比 KNN/决策树/朴素贝叶斯/逻辑回归四种模型准确率',
+      '<strong>朴素贝叶斯文本分类</strong> —— 侮辱性言论检测，词袋模型 + 条件概率',
+      '<strong>用户流失预测</strong> —— 决策树分析电信客户 churn 特征',
+      '<strong>空气质量多元回归</strong> —— 多特征线性回归预测空气质量指数',
+    ] },
+  { title: '📈 模型评估与特征工程', open: true,
+    topics: [
+      '<strong>评估指标</strong> —— 准确率、精确率、召回率、F1、混淆矩阵、ROC-AUC',
+      '<strong>数据集划分</strong> —— train_test_split、分层抽样（stratify）',
+      '<strong>特征标准化</strong> —— StandardScaler、归一化对模型的影响',
+      '<strong>决策边界可视化</strong> —— contour 绘制，直观比较不同分类器',
+      '<strong>模型对比</strong> —— 在同一数据集上对比多种算法的表现差异',
+      '<strong>超参数</strong> —— 了解 max_depth、k 值、kernel 等关键参数的含义',
+    ] },
+  { title: '🐍 Python 数据科学生态', open: true,
+    topics: [
+      '<strong>numpy</strong> —— 数组运算、矩阵操作、随机数生成、数据预处理',
+      '<strong>pandas</strong> —— DataFrame 读写 CSV、缺失值处理、数据筛选与统计',
+      '<strong>matplotlib</strong> —— 散点图、柱状图、决策边界子图布局（subplot）',
+      '<strong>scikit-learn</strong> —— 统一 API 调用分类/回归/聚类模型、模型评估',
+      '<strong>Jupyter Notebook</strong> —— 交互式实验与 Markdown 报告撰写',
+    ] },
+  { title: '🎯 正在学习 / 下一步', open: true, dashed: true,
+    topics: [
+      '<strong>数学基础</strong> —— 线性代数（矩阵求导、SVD）、概率论（MLE）、信息论',
+      '<strong>集成学习</strong> —— Random Forest、XGBoost 的原理与调参',
+      '<strong>特征工程进阶</strong> —— PCA 降维、特征选择、类别编码',
+      '<strong>神经网络入门</strong> —— 反向传播推导、PyTorch 基础',
+      '<strong>NLP 入门</strong> —— 词向量（Word2Vec）、文本预处理流水线',
+      '<strong>面试准备</strong> —— ML 八股文、手推公式、Kaggle 入门',
+    ] },
+]
+
+export default mlCards

@@ -1,19 +1,14 @@
 {
-  "name": "xianghuayin-personal-site",
-  "version": "0.1.0",
+  "name": "qhy-personal-site",
+  "version": "2.0.0",
   "private": true,
-  "description": "羌花吟の个人网站 · 像素风个人主页（静态站点，可直接用浏览器打开 index.html）",
+  "description": "羌花吟の个人网站 · Vue 3 + Vite 全栈式个人主页",
   "scripts": {
-    "start": "echo \"这是一个纯静态页面项目，直接用浏览器打开 index.html 即可预览。\""
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "install:all": "cd frontend && npm install"
   },
-  "keywords": [
-    "personal-site",
-    "pixel-art",
-    "portfolio",
-    "xianghuayin"
-  ],
+  "keywords": ["personal-site", "pixel-art", "portfolio", "xianghuayin"],
   "author": "",
-  "license": "MIT",
-  "dependencies": {}
+  "license": "MIT"
 }
-

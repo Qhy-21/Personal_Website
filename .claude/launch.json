@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--host"],
+      "cwd": "C:\\Users\\zhf18\\Desktop\\羌花吟の个人网站\\frontend",
+      "port": 5173
+    }
+  ]
+}

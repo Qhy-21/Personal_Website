@@ -1,0 +1,28 @@
+const projects = [
+  { label: 'WRITING · 00', title: '墨笺 - 个人书写平台',
+    description: '基于 Node.js + Koa 2 + Vue 3 构建的全栈个人写作应用。支持 Markdown 编辑预览、文章分类管理、标签系统、主题切换（浅色/深色/护眼）、图片上传、全文搜索。数据使用本地 JSON 文件存储，PDF/Word 导出使用 Puppeteer。采用迭代开发模式（MVP → 功能增强）。',
+    tech_tags: 'Node.js,Koa 2,Vue 3,Vite,marked,Puppeteer', status: 'completed', status_label: '独立开发', year: '2026',
+    link: 'https://github.com/Qhy-21' },
+  { label: 'E-COMMERCE · 01', title: '网上橱窗商城（SpringBoot 版）',
+    description: 'SpringBoot 3.2 + Vue 3 重构的电商平台，替代原 Servlet/JSP 架构。商品浏览（分类+排序+分页）、JWT 认证、购物车、后台管理。MyBatis-Plus 分页 + HikariCP 连接池。',
+    tech_tags: 'SpringBoot,MyBatis-Plus,MySQL,Vue 3,JWT', status: 'completed', status_label: '独立开发', year: '2025',
+    link: 'https://github.com/Qhy-21' },
+  { label: 'MOBILE · 02', title: 'Android 应用实践',
+    description: '使用 Java 完成音乐播放器、通讯录增删改查等多个小应用。熟悉 RecyclerView、Activity 跳转、JSON 数据解析等基础技能。',
+    tech_tags: 'Java,Android SDK,RecyclerView', status: 'completed', status_label: '独立开发', year: '2025',
+    link: 'https://github.com/Qhy-21' },
+  { label: 'WEB · 03', title: '个人网站 & 学习计时器',
+    description: '自学 HTML + CSS + JavaScript，从零搭建了这个像素小屋。开发了统计计时的学习计时器，数据存储在浏览器本地（LocalStorage）。',
+    tech_tags: 'HTML,CSS,JavaScript,LocalStorage', status: 'completed', status_label: '自学全栈', year: '2026',
+    link: 'https://github.com/Qhy-21' },
+  { label: 'CHAT · 04', title: 'EasyChat 仿微信聊天',
+    description: '跟随教程学习 SpringBoot + Netty + MyBatis-Plus 技术栈。已基本完成用户模块数据库设计与基础接口搭建，正在持续完善中。',
+    tech_tags: 'SpringBoot,Netty,MyBatis-Plus,MySQL', status: 'ongoing', status_label: '开发中', year: '2026',
+    link: 'https://github.com/Qhy-21' },
+  { label: 'CONTENT · 05', title: 'B站教学视频',
+    description: '录制了 Android + DeepSeek 入门教程，发布在 B站，帮助同学复习的同时锻炼表达能力。',
+    tech_tags: 'Android,DeepSeek,内容创作', status: 'completed', status_label: '已完成', year: '',
+    link: 'https://www.bilibili.com/video/BV1MV2DBzEyf' },
+]
+
+export default projects

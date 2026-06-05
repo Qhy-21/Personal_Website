@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alfie · Java后端开发实习生简历</title>
+    <style>
+        :root {
+            --text-primary: #1a1a1a; --text-secondary: #3a3a3a; --text-muted: #555;
+            --accent: #1e5a8a; --border: #d0d5dc;
+            --bg-paper: #ffffff; --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            background-color: #e8ecf1; display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh; padding: 12px; color: var(--text-primary);
+            -webkit-font-smoothing: antialiased; line-height: 1.55; font-size: 12px;
+        }
+        .resume-paper { width: 100%; max-width: 700px; background: var(--bg-paper); box-shadow: var(--shadow); border-radius: 2px; padding: 22px 26px 16px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 2px solid var(--accent); margin-bottom: 8px; }
+        .header-name { font-size: 26px; font-weight: 700; letter-spacing: 2px; color: #0d0d0d; }
+        .header-subtitle { font-size: 12px; font-weight: 500; color: var(--accent); margin-top: 2px; }
+        .header-contacts { font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+        .header-contacts span { white-space: nowrap; }
+        .section { margin-top: 12px; }
+        .section-title { font-size: 13px; font-weight: 700; color: #0d0d0d; letter-spacing: 1px; padding-bottom: 3px; border-bottom: 1px solid var(--border); margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .section-title::before { content: ''; display: inline-block; width: 3px; height: 12px; background-color: var(--accent); border-radius: 2px; flex-shrink: 0; }
+        .edu-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; }
+        .edu-school { font-weight: 700; }
+        .edu-major { color: var(--text-secondary); }
+        .edu-time { color: var(--text-muted); font-size: 11px; }
+        .project-item { margin-bottom: 13px; }
+        .project-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1px; }
+        .project-name { font-weight: 700; font-size: 12px; color: #0d0d0d; }
+        .project-meta { font-size: 10px; color: var(--text-muted); font-weight: 400; margin-left: 6px; }
+        .project-tag { font-size: 10px; color: #fff; background-color: var(--accent); padding: 0 6px; border-radius: 8px; font-weight: 500; flex-shrink: 0; white-space: nowrap; line-height: 1.6; }
+        .project-tag.ongoing { background-color: #e8960c; }
+        .project-tag.highlight { background-color: #1a6b3c; }
+        .project-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        .project-desc ul { list-style: none; padding-left: 0; }
+        .project-desc ul li { position: relative; padding-left: 10px; margin-bottom: 1px; }
+        .project-desc ul li::before { content: '–'; position: absolute; left: 0; top: 0; color: #999; font-size: 10px; }
+        .project-tech { font-size: 10px; color: #666; margin-top: 2px; line-height: 1.4; }
+        .project-tech strong { color: #444; font-weight: 600; }
+        .other-practice { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-top: 6px; }
+        .other-practice .item { position: relative; padding-left: 10px; margin-bottom: 2px; }
+        .other-practice .item::before { content: '–'; position: absolute; left: 0; top: 0; color: #999; font-size: 10px; }
+        .other-practice a { color: var(--accent); text-decoration: none; }
+        .portfolio-item { margin-bottom: 8px; }
+        .portfolio-item .portfolio-name { font-weight: 700; font-size: 12px; color: #0d0d0d; }
+        .portfolio-item .portfolio-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-top: 1px; }
+        .portfolio-item .portfolio-desc ul { list-style: none; padding-left: 0; }
+        .portfolio-item .portfolio-desc ul li { position: relative; padding-left: 10px; margin-bottom: 1px; }
+        .portfolio-item .portfolio-desc ul li::before { content: '–'; position: absolute; left: 0; top: 0; color: #999; font-size: 10px; }
+        .skills-grid { display: flex; flex-direction: column; gap: 5px; font-size: 11.5px; }
+        .skill-category { display: flex; align-items: flex-start; gap: 5px; }
+        .skill-label { font-weight: 700; color: #0d0d0d; white-space: nowrap; min-width: 65px; font-size: 11.5px; flex-shrink: 0; }
+        .skill-content { color: var(--text-secondary); font-size: 11.5px; line-height: 1.5; flex: 1; }
+        .skill-highlight { color: #0d0d0d; font-weight: 600; }
+        .self-eval { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+        .self-eval p { position: relative; padding-left: 10px; margin-bottom: 4px; }
+        .self-eval p::before { content: '–'; position: absolute; left: 0; top: 0; color: #999; font-size: 10px; }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .resume-paper { box-shadow: none; border-radius: 0; max-width: 100%; padding: 5mm 8mm 4mm; background: #fff; }
+            @page { size: A4; margin: 5mm 6mm; }
+            * { color: #000 !important; background: transparent !important; box-shadow: none !important; }
+            .header { border-bottom-color: #333 !important; }
+            .section-title { border-bottom-color: #555 !important; }
+            .section-title::before { background-color: #000 !important; }
+            .project-tag { border: 1px solid #333 !important; color: #000 !important; background: #f5f5f5 !important; }
+            a { color: #000 !important; text-decoration: underline; }
+            .resume-paper, .section, .project-item, .header { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="resume-paper">
+
+    <div class="header">
+        <div class="header-left">
+            <div class="header-name">Alfie</div>
+            <div class="header-subtitle">Java后端开发实习生 | Java全栈开发实习生 | AI应用开发实习生</div>
+            <div class="header-contacts">
+                <span>📞 151********</span>
+                <span>✉️ zhf1830657854@163.com</span>
+                <span>🌐 <a href="https://qhy-alfie.work" target="_blank">qhy-alfie.work</a></span>
+                <span>🐙 <a href="https://github.com/Qhy-21" target="_blank">github.com/Qhy-21</a></span>
+                <span>📍 合肥</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="edu-row">
+            <span><span class="edu-school">合肥师范学院</span> <span class="edu-major">| 软件工程 | 本科在读（大三，2027届）</span></span>
+            <span class="edu-time">成绩良好</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">项目经历</div>
+
+        <div class="project-item">
+            <div class="project-header">
+                <span class="project-name">网上橱窗 — SpringBoot 全栈电商平台</span>
+                <span class="project-tag highlight">主力项目</span>
+            </div>
+            <div class="project-desc">
+                <ul>
+                    <li>独立完成<strong>需求分析、数据库设计、后端接口开发、前端实现与项目部署</strong>的全流程，替代原 Servlet/JSP 架构，构建前后端分离电商平台</li>
+                    <li>后端：<strong>SpringBoot 3.2 + MyBatis-Plus</strong>，采用 Controller → Service → Mapper 三层架构，<strong>RESTful API</strong> 设计，统一响应格式与全局异常处理</li>
+                    <li>认证：<strong>JWT</strong> 无状态认证 + 拦截器校验，实现登录态管理与接口权限控制</li>
+                    <li>数据层：MyBatis-Plus 条件构造器 + 分页插件实现商品多条件筛选与排序查询；<strong>HikariCP</strong> 连接池管理数据库连接；完成 users / products / cart_items 三表设计与联表查询</li>
+                    <li>前端：Vue 3 + Pinia + Vue Router + Axios，封装请求拦截器统一注入 Token 与 401 自动跳转登录页</li>
+                    <li>工程化：<strong>Maven</strong> 依赖管理，<strong>Git</strong> 版本控制，前后端独立构建部署</li>
+                </ul>
+            </div>
+            <div class="project-tech"><strong>技术栈：</strong>SpringBoot 3.2 + MyBatis-Plus + MySQL + JWT + HikariCP + Vue 3 + Vite + Pinia + Axios + Maven + Git</div>
+        </div>
+
+        <div class="project-item">
+            <div class="project-header">
+                <span class="project-name">墨笺 — 全栈个人书写平台</span>
+                <span class="project-tag">独立全栈</span>
+            </div>
+            <div class="project-desc">
+                <ul>
+                    <li>基于 <strong>Node.js + Koa 2 + MySQL + Vue 3</strong> 的全栈写作应用，前后端分离架构，采用 MVP → 功能迭代的开发模式</li>
+                    <li>后端：Koa 2 中间件机制 + RESTful API，<strong>MySQL</strong>（用户/文章/分类三表）+ <strong>JWT</strong> 认证（注册/登录 + bcryptjs 密码加密），文章归属权限控制</li>
+                    <li>前端：Vue 3 Composition API + Vue Router + Axios，<strong>marked + DOMPurify</strong> 渲染 Markdown 并做 XSS 防护，CSS 变量实现浅色/深色/护眼三套主题切换</li>
+                    <li>功能：文章 CRUD + 全文搜索 + 分类筛选 + 分页 + 标签系统 + 图片上传，<strong>Puppeteer</strong> 实现 PDF / Word 多格式导出</li>
+                    <li>迭代演进：v1.0 JSON 文件快速验证 → v2.0 MySQL + JWT 认证重构，独立完成全流程</li>
+                </ul>
+            </div>
+            <div class="project-tech"><strong>技术栈：</strong>Node.js + Koa 2 + MySQL + JWT + bcryptjs + Vue 3 + Vite + marked + DOMPurify + Puppeteer</div>
+        </div>
+
+        <div class="project-item">
+            <div class="project-header">
+                <span class="project-name">EasyChat — 即时通讯应用</span>
+                <span class="project-tag ongoing">进行中</span>
+            </div>
+            <div class="project-desc">
+                <ul>
+                    <li>基于 <strong>SpringBoot + Netty + MyBatis-Plus + MySQL</strong> 构建的仿微信即时通讯系统</li>
+                    <li>已完成<strong>用户模块数据库设计</strong>（用户表、好友关系表、消息记录表）与基础 CRUD 接口开发</li>
+                    <li>基于 <strong>Netty WebSocket</strong> 搭建长连接通信框架，实现消息实时推送</li>
+                </ul>
+            </div>
+            <div class="project-tech"><strong>技术栈：</strong>SpringBoot + Netty + MyBatis-Plus + MySQL + WebSocket</div>
+        </div>
+
+        <div class="other-practice">
+            <div class="item">
+                <strong>B站技术教程：</strong>录制 Android + DeepSeek API 入门教学视频
+                <a href="https://www.bilibili.com/video/BV1MV2DBzEyf" target="_blank">BV1MV2DBzEyf</a>
+                ；<strong>Android 应用实践：</strong>Java 完成音乐播放器、通讯录 CRUD 等多个小应用；<strong>机器学习：</strong>使用 Python（numpy / pandas / scikit-learn）完成分类与回归课程实验，掌握模型评估与特征工程基础
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">个人作品</div>
+        <div class="portfolio-item">
+            <div class="portfolio-name">个人网站 <a href="https://qhy-alfie.work" target="_blank" style="font-size:11px;">qhy-alfie.work</a></div>
+            <div class="portfolio-desc">
+                <ul>
+                    <li>独立完成<strong>视觉设计、前端开发、域名配置与服务器部署</strong>上线的个人技术展示网站</li>
+                    <li>像素风视觉风格，包含首页、关于我、技能树、项目展示、随笔、联络六大模块，响应式布局</li>
+                    <li>纯 HTML / CSS / JavaScript 从零搭建，部署于服务器并绑定自定义域名</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skills-grid">
+            <div class="skill-category">
+                <span class="skill-label">后端：</span>
+                <span class="skill-content">熟练 <span class="skill-highlight">SpringBoot 3 + MyBatis-Plus</span>（RESTful API、JWT 认证、拦截器、分页、全局异常处理）；掌握 <span class="skill-highlight">Node.js + Koa 2</span>，理解中间件机制与异步编程</span>
+            </div>
+            <div class="skill-category">
+                <span class="skill-label">数据库：</span>
+                <span class="skill-content">熟练 <span class="skill-highlight">MySQL</span>（表设计、联表查询、外键约束），掌握 <span class="skill-highlight">HikariCP</span> 连接池配置与 MyBatis-Plus 条件构造器</span>
+            </div>
+            <div class="skill-category">
+                <span class="skill-label">前端：</span>
+                <span class="skill-content">掌握 HTML5 / CSS3 / JavaScript (ES6+)，熟练 <span class="skill-highlight">Vue 3 + Vite + Pinia</span>，理解组件化开发与前后端分离架构</span>
+            </div>
+            <div class="skill-category">
+                <span class="skill-label">AI / 数据：</span>
+                <span class="skill-content">具备<span class="skill-highlight">机器学习基础</span>，熟悉 <span class="skill-highlight">Python</span> 数据分析生态（numpy、pandas、scikit-learn），了解分类、回归、聚类经典算法</span>
+            </div>
+            <div class="skill-category">
+                <span class="skill-label">工具：</span>
+                <span class="skill-content"><span class="skill-highlight">Git</span>（分支管理、协作流程）、<span class="skill-highlight">Maven</span> / npm、Postman、Linux 基础操作、Jupyter，善用 AI 工具辅助开发</span>
+            </div>
+            <div class="skill-category">
+                <span class="skill-label">CS基础：</span>
+                <span class="skill-content">数据结构与算法、计算机网络（TCP/IP、HTTP）、面向对象设计</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">自我评价</div>
+        <div class="self-eval">
+            <p>具备<strong>独立完成前后端分离项目</strong>的全流程能力：需求分析 → 数据库设计 → 接口开发 → 前端实现 → 部署上线</p>
+            <p>以项目驱动技术学习，累计完成 4 个以上完整项目（2 个全栈项目 + 即时通讯 + 个人网站），每次迭代均有 GitHub 提交记录</p>
+            <p>持续进行技术输出：个人网站展示技术栈与作品，B站发布教学视频，对 AI 应用开发方向有实践探索</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
