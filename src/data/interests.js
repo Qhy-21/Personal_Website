@@ -15,6 +15,7 @@ const interests = [
   { text: '世界尽头与冷酷仙境', weight: 3 },
   { text: '葛城美里', weight: 5 },
   { text: '碇真嗣', weight: 5 },
+  { text: '小林家的小林', weight: 5 }
 ]
 
 export default interests
