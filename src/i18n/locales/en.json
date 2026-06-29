@@ -1,0 +1,90 @@
+{
+  "site": {
+    "title": "QHY's Pixel World",
+    "tagline": "Living Between Bit Streams",
+    "loading": "Loading...",
+    "loadingSub": "Living Between Bit Streams"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "skills": "Skills",
+    "projects": "Projects",
+    "journal": "Journal",
+    "contact": "Contact"
+  },
+  "home": {
+    "tag": "COMPUTER SCIENCE",
+    "greeting": "QHY",
+    "subtitle": "Living Between Bit Streams",
+    "intro": "A pixel cabin I built in the cracks of the internet.\nA full-stack learner who writes backend APIs and crafts frontend interfaces.",
+    "viewProjects": "View Projects",
+    "contactMe": "Contact Me",
+    "version": "v2.0 · Glassmorphism Rebuild",
+    "name": "Alfie",
+    "role": "Java / CS / Words",
+    "status": "\"Loading new possibilities…\"",
+    "learnMore": "Learn More",
+    "moodLabel": "Today's Mood · PIXEL MOOD",
+    "mood": "127.0.0.1"
+  },
+  "about": {
+    "title": "About · ABOUT",
+    "name": "Alfie",
+    "role": "Java / Software Dev Intern",
+    "desc": "A junior CS student at Hefei Normal University.\nFull-stack developer — backend APIs and creative frontend work.",
+    "basicInfo": "Basic Info",
+    "website": "Website",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location",
+    "age": "Age",
+    "school": "School",
+    "locationValue": "Hefei, Anhui",
+    "ageValue": "22",
+    "schoolValue": "Hefei Normal University · Software Engineering",
+    "timeline": "Timeline · TIMELINE",
+    "tl2023Title": "2023 · First Code",
+    "tl2023Text": "The moment I typed 'Hello, World!' on an old keyboard, the world began to change.",
+    "tl2024Title": "2024 · Java Journey",
+    "tl2024Text": "Started systematic Java learning — JavaWeb, databases, and full-stack interaction.",
+    "tl2025Title": "2025 · Real Projects",
+    "tl2025Text": "Built Android apps and an e-commerce platform, gaining hands-on experience.",
+    "tl2026Title": "Early 2026 · Full-Stack Exploration",
+    "tl2026Text": "Personal website, study timer, InkSlab writing platform, EasyChat messenger — one by one.",
+    "tlNowTitle": "Now · Continuously Loading",
+    "slogan": "Full-Stack × AI · Never Stop Learning"
+  },
+  "skills": {
+    "title": "Skill Tree · SKILL TREE",
+    "mlTitle": "ML Knowledge Tree · ML KNOWLEDGE TREE",
+    "mlFooter": "🎯 Continuously updating · Building AI knowledge base"
+  },
+  "projects": {
+    "title": "Projects · PROJECTS"
+  },
+  "journal": {
+    "title": "Notes · NOTES"
+  },
+  "contact": {
+    "title": "Contact · CONTACT",
+    "findMe": "How to Find Me",
+    "website": "Website",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location",
+    "school": "School",
+    "locationValue": "Hefei, Anhui",
+    "schoolValue": "Hefei Normal University · Software Engineering",
+    "messageToFuture": "To My Future Self",
+    "msg1": "Maybe one day, when you revisit this page, everything will look completely different.",
+    "msg2": "But that's okay — iteration is the nature of life.",
+    "msg3": "Just remember: you once built a tiny pixel room here for yourself. That's enough.",
+    "viewResume": "📄 View My Resume"
+  },
+  "footer": {
+    "left": "© {year} QHY",
+    "right1": "Made with ♥ in a pixel world",
+    "right2": "Living between bit streams"
+  }
+}

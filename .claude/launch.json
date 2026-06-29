@@ -2,11 +2,11 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "frontend",
+      "name": "qhy-website",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--host"],
-      "cwd": "C:\\Users\\zhf18\\Desktop\\羌花吟の个人网站\\frontend",
-      "port": 5173
+      "runtimeArgs": ["vite", "--port", "5200", "--host"],
+      "cwd": "C:\\Users\\zhf18\\Desktop\\羌花吟の个人网站",
+      "port": 5200
     }
   ]
 }

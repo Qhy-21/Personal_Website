@@ -1,32 +1,185 @@
 <script setup>
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { watch } from 'vue'
 
 const route = useRoute()
+const { t, locale } = useI18n()
+
+function toggleLang() {
+  locale.value = locale.value === 'zh-CN' ? 'en' : 'zh-CN'
+}
+
+watch(locale, (val) => {
+  localStorage.setItem('lang', val)
+})
+
 const navItems = [
-  { path: '/', label: '首页' },
-  { path: '/about', label: '关于我' },
-  { path: '/skills', label: '技能树' },
-  { path: '/projects', label: '小作品' },
-  { path: '/journal', label: '碎碎念' },
-  { path: '/contact', label: '联络' },
+  { path: '/', label: () => t('nav.home') },
+  { path: '/about', label: () => t('nav.about') },
+  { path: '/skills', label: () => t('nav.skills') },
+  { path: '/projects', label: () => t('nav.projects') },
+  { path: '/journal', label: () => t('nav.journal') },
+  { path: '/contact', label: () => t('nav.contact') },
 ]
 </script>
 
 <template>
-  <header class="pixel-header">
-    <div class="site-logo">
-      <span class="logo-mark">◆</span>
-      <span class="logo-text">羌花吟の个人网站</span>
+  <header class="glass-header">
+    <div class="header-inner">
+      <div class="site-logo">
+        <span class="logo-mark">◆</span>
+        <span class="logo-text">{{ t('site.title') }}</span>
+      </div>
+      <nav class="glass-nav">
+        <router-link
+          v-for="item in navItems"
+          :key="item.path"
+          :to="item.path"
+          :class="{ 'is-active': route.path === item.path }"
+        >
+          {{ item.label() }}
+        </router-link>
+      </nav>
+      <button class="lang-toggle" @click="toggleLang" :aria-label="locale === 'zh-CN' ? 'Switch to English' : '切换到中文'">
+        <span class="lang-option" :class="{ active: locale === 'zh-CN' }">中</span>
+        <span class="lang-divider">/</span>
+        <span class="lang-option" :class="{ active: locale === 'en' }">EN</span>
+      </button>
     </div>
-    <nav class="pixel-nav">
-      <router-link
-        v-for="item in navItems"
-        :key="item.path"
-        :to="item.path"
-        :class="{ 'is-active': route.path === item.path }"
-      >
-        {{ item.label }}
-      </router-link>
-    </nav>
   </header>
 </template>
+
+<style scoped>
+.glass-header {
+  position: sticky;
+  top: 16px;
+  z-index: 100;
+  margin-bottom: 40px;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 24px;
+  background: rgba(18, 18, 26, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-normal) var(--ease-out);
+}
+
+.header-inner:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.site-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.logo-mark {
+  color: var(--accent-strong);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%, 100% { text-shadow: 0 0 6px var(--accent-glow); }
+  50% { text-shadow: 0 0 16px var(--accent-glow), 0 0 28px var(--accent-glow); }
+}
+
+.logo-text {
+  text-shadow: 0 0 8px rgba(255, 126, 179, 0.5);
+}
+
+.glass-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.glass-nav a {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.glass-nav a:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.glass-nav a.is-active,
+.glass-nav a.router-link-exact-active {
+  color: var(--accent);
+  background: rgba(255, 126, 179, 0.1);
+  box-shadow: inset 0 -1px 0 0 var(--accent);
+}
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.lang-toggle:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.lang-option {
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.lang-option.active {
+  color: var(--accent);
+  background: rgba(255, 126, 179, 0.15);
+}
+
+.lang-divider {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .header-inner {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  .glass-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    font-size: 11px;
+  }
+
+  .glass-nav a {
+    padding: 4px 10px;
+  }
+}
+</style>

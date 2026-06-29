@@ -33,4 +33,11 @@ const skillGroups = {
 
 export const groupKeys = ['语言 & 基础', '后端技术', '前端 & 工具', 'AI / ML 专项']
 
+export const groupNameMap = {
+  '语言 & 基础': { 'zh-CN': '语言 & 基础', en: 'Languages & Fundamentals' },
+  '后端技术': { 'zh-CN': '后端技术', en: 'Backend' },
+  '前端 & 工具': { 'zh-CN': '前端 & 工具', en: 'Frontend & Tools' },
+  'AI / ML 专项': { 'zh-CN': 'AI / ML 专项', en: 'AI / ML' },
+}
+
 export default skillGroups
