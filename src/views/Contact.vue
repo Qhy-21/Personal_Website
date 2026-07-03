@@ -7,7 +7,7 @@ const { t } = useI18n()
   <section class="section">
     <h2 class="section-title">{{ t('contact.title') }}</h2>
     <div class="contact-grid">
-      <div class="pixel-card">
+      <div class="pixel-card" :style="{ animationDelay: '0.08s' }">
         <h3>{{ t('contact.findMe') }}</h3>
         <ul class="contact-list">
           <li>
@@ -58,7 +58,7 @@ const { t } = useI18n()
         </div>
       </div>
 
-      <div class="pixel-card future-card">
+      <div class="pixel-card future-card" :style="{ animationDelay: '0.16s' }">
         <h3>{{ t('contact.messageToFuture') }}</h3>
         <div class="future-content">
           <p>{{ t('contact.msg1') }}</p>
@@ -80,6 +80,10 @@ const { t } = useI18n()
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
+}
+
+.contact-grid .pixel-card {
+  animation: fadeInUp 0.5s var(--ease-out) backwards;
 }
 
 .contact-list {

@@ -30,7 +30,8 @@ function cardTopics(card) {
   <section class="section">
     <h2 class="section-title">{{ t('skills.title') }}</h2>
     <div class="skills-grid">
-      <div v-for="groupKey in groupKeys" :key="groupKey" class="pixel-card skill-group">
+      <div v-for="(groupKey, i) in groupKeys" :key="groupKey" class="pixel-card skill-group"
+        :style="{ animationDelay: `${0.08 * (i + 1)}s` }">
         <h3>{{ groupDisplay(groupKey) }}</h3>
         <ul class="skill-list">
           <li v-for="skill in skillsData[groupKey]" :key="skill.name">
@@ -55,7 +56,7 @@ function cardTopics(card) {
         :key="i"
         class="pixel-card ml-card"
         :class="{ 'is-open': card.open }"
-        :style="card.dashed ? { borderStyle: 'dashed' } : {}"
+        :style="{ ...(card.dashed ? { borderStyle: 'dashed' } : {}), animationDelay: `${0.06 * (i + 1)}s` }"
       >
         <div class="ml-card-header" @click="toggleCard(card)">
           <span class="ml-card-title">{{ cardTitle(card) }}</span>
@@ -77,6 +78,10 @@ function cardTopics(card) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
+}
+
+.skill-group {
+  animation: fadeInUp 0.5s var(--ease-out) backwards;
 }
 
 .skill-group h3 {
@@ -148,6 +153,7 @@ function cardTopics(card) {
   cursor: pointer;
   transition: all var(--duration-normal) var(--ease-out);
   overflow: hidden;
+  animation: fadeInUp 0.5s var(--ease-out) backwards;
 }
 
 .ml-card::before { display: none; }

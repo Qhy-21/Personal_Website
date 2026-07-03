@@ -54,10 +54,10 @@ const shuffled = shuffle(interestsData)
 
 /* ===== tag cloud styles ===== */
 const colors = [
-  '#ff7eb3', '#ff9999', '#ffcc99', '#ffff99',
-  '#99ff99', '#99ffff', '#99ccff', '#cc99ff',
-  '#ff99cc', '#ff6666', '#ff9966', '#ffcc66',
-  '#66ffcc', '#66ccff', '#cc66ff', '#ff66b3',
+  '#d44078', '#c73e6b', '#b04ad2', '#8b5cf6',
+  '#6d5ac3', '#4a8ad4', '#3b82b6', '#0ea5a0',
+  '#089b7a', '#59a043', '#c04a2e', '#d4743c',
+  '#d44078', '#b04ad2', '#4a8ad4', '#0ea5a0',
 ]
 
 const tagStyles = computed(() =>
@@ -83,6 +83,26 @@ const activeId = ref(null)
 const currentPage = ref(0)
 const carouselIdx = ref(0)
 let carouselTimer = null
+
+/* ===== tag dismiss game ===== */
+const dismissedTags = ref(new Set())
+const qrModalOpen = ref(false)
+
+function dismissAndOpen(item) {
+  dismissedTags.value = new Set([...dismissedTags.value, item.id])
+  if (dismissedTags.value.size >= interestsData.length) {
+    setTimeout(() => {
+      dismissedTags.value = new Set()
+      qrModalOpen.value = true
+    }, 450)
+  } else {
+    openInterest(item)
+  }
+}
+
+function closeQrModal() {
+  qrModalOpen.value = false
+}
 
 const activeInterest = computed(() =>
   interestsData.find((it) => it.id === activeId.value)
@@ -177,7 +197,8 @@ function closeInterest() {
 
 function onKeydown(e) {
   if (e.key === 'Escape') {
-    if (activeId.value) closeInterest()
+    if (qrModalOpen.value) closeQrModal()
+    else if (activeId.value) closeInterest()
     else avatarModalOpen.value = false
   }
   if (e.key === 'ArrowLeft' && activeId.value && hasPages.value) {
@@ -215,7 +236,6 @@ onUnmounted(() => {
         <router-link to="/projects" class="btn btn-primary">{{ t('home.viewProjects') }}</router-link>
         <router-link to="/contact" class="btn btn-ghost">{{ t('home.contactMe') }}</router-link>
       </div>
-      <p class="hero-version">{{ t('home.version') }}</p>
     </div>
 
     <div class="hero-right">
@@ -248,8 +268,9 @@ onUnmounted(() => {
         :key="item.id"
         type="button"
         class="cloud-tag jelly"
+        :class="{ 'tag-gone': dismissedTags.has(item.id) }"
         :style="tagStyles[i]"
-        @click="openInterest(item)"
+        @click="dismissAndOpen(item)"
       >{{ label(item) }}</button>
     </div>
   </section>
@@ -310,6 +331,19 @@ onUnmounted(() => {
       </div>
     </Transition>
   </Teleport>
+
+  <!-- QR Code Modal -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="qrModalOpen" class="qr-modal" @click.self="closeQrModal">
+        <div class="qr-modal-inner">
+          <button type="button" class="interest-close" @click="closeQrModal" aria-label="Close">&times;</button>
+          <img :src="'/wechat-qr.jpg'" alt="WeChat QR Code" class="qr-image">
+          <p class="qr-text">{{ locale === 'en' ? "Now you know all about me. Maybe you'd like to be friends?" : '了解完全部，也许你想和我成为朋友。' }}</p>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -338,7 +372,7 @@ onUnmounted(() => {
   font-size: 32px;
   line-height: 1.3;
   margin: 16px 0 20px;
-  background: linear-gradient(135deg, #ff7eb3, #ffffff);
+  background: linear-gradient(135deg, #d44078, var(--text));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -361,7 +395,6 @@ onUnmounted(() => {
 }
 
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
-.hero-version { font-size: 11px; color: var(--text-muted); }
 
 .hero-right { display: flex; flex-direction: column; gap: 16px; }
 
@@ -407,7 +440,13 @@ onUnmounted(() => {
 }
 
 /* ===== Interest Cloud ===== */
-.interest-section { margin-top: 16px; }
+.interest-section {
+  margin-top: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px 28px;
+}
 
 .interest-cloud {
   display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
@@ -447,6 +486,17 @@ onUnmounted(() => {
   100% { transform: scale(1.18); }
 }
 
+/* ---- tag dismiss ---- */
+.tag-gone {
+  animation: tagPopOut 0.35s var(--ease-out) forwards;
+  pointer-events: none;
+}
+
+@keyframes tagPopOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.3) translateY(-20px); }
+}
+
 /* ===== Avatar Modal ===== */
 .avatar-modal {
   position: fixed; inset: 0; z-index: 200;
@@ -479,13 +529,12 @@ onUnmounted(() => {
   position: relative;
   max-width: min(520px, 92vw); width: 100%; max-height: 88vh;
   overflow-y: auto;
-  background: rgba(24, 24, 37, 0.78);
+  background: var(--bg-elevated);
   backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   padding: 32px 28px 28px;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55),
-              0 0 0 1px rgba(255, 128, 184, 0.08) inset;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
 }
 
 .interest-close {
@@ -497,7 +546,7 @@ onUnmounted(() => {
   border-radius: 50%;
   transition: all var(--duration-fast) var(--ease-out);
 }
-.interest-close:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.interest-close:hover { color: var(--text); background: rgba(128,128,128,0.1); }
 
 /* ---- carousel ---- */
 .carousel {
@@ -601,6 +650,40 @@ onUnmounted(() => {
 .page-label {
   font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
   min-width: 48px; text-align: center;
+}
+
+/* ===== QR Modal ===== */
+.qr-modal {
+  position: fixed; inset: 0; z-index: 210;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5, 2, 8, 0.55);
+  backdrop-filter: blur(20px) saturate(140%);
+}
+
+.qr-modal-inner {
+  position: relative;
+  max-width: min(360px, 90vw);
+  background: rgba(24, 24, 37, 0.85);
+  backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 36px 28px 28px;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55),
+              0 0 0 1px rgba(255, 128, 184, 0.08) inset;
+  animation: fadeInUp 0.5s var(--ease-out);
+}
+
+.qr-image {
+  width: 200px; height: 200px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: block; margin: 0 auto 20px;
+}
+
+.qr-text {
+  font-size: 15px; line-height: 1.7;
+  color: var(--text-muted); margin: 0;
 }
 
 /* ===== transitions ===== */

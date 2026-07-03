@@ -1,10 +1,13 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { watch } from 'vue'
+import { watch, inject } from 'vue'
 
 const route = useRoute()
 const { t, locale } = useI18n()
+
+const theme = inject('theme')
+const toggleTheme = inject('toggleTheme')
 
 function toggleLang() {
   locale.value = locale.value === 'zh-CN' ? 'en' : 'zh-CN'
@@ -41,11 +44,17 @@ const navItems = [
           {{ item.label() }}
         </router-link>
       </nav>
-      <button class="lang-toggle" @click="toggleLang" :aria-label="locale === 'zh-CN' ? 'Switch to English' : '切换到中文'">
-        <span class="lang-option" :class="{ active: locale === 'zh-CN' }">中</span>
-        <span class="lang-divider">/</span>
-        <span class="lang-option" :class="{ active: locale === 'en' }">EN</span>
-      </button>
+      <div class="header-actions">
+        <button class="theme-toggle" @click="toggleTheme" :aria-label="theme === 'dark' ? '切换到浅色模式' : 'Switch to dark mode'">
+          <span v-if="theme === 'dark'" class="theme-icon">&#9790;</span>
+          <span v-else class="theme-icon">&#9788;</span>
+        </button>
+        <button class="lang-toggle" @click="toggleLang" :aria-label="locale === 'zh-CN' ? 'Switch to English' : '切换到中文'">
+          <span class="lang-option" :class="{ active: locale === 'zh-CN' }">中</span>
+          <span class="lang-divider">/</span>
+          <span class="lang-option" :class="{ active: locale === 'en' }">EN</span>
+        </button>
+      </div>
     </div>
   </header>
 </template>
@@ -64,7 +73,7 @@ const navItems = [
   justify-content: space-between;
   gap: 16px;
   padding: 12px 24px;
-  background: rgba(18, 18, 26, 0.65);
+  background: var(--bg-card);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid var(--border);
@@ -73,7 +82,7 @@ const navItems = [
 }
 
 .header-inner:hover {
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-strong);
 }
 
 .site-logo {
@@ -118,7 +127,7 @@ const navItems = [
 
 .glass-nav a:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(128, 128, 128, 0.08);
 }
 
 .glass-nav a.is-active,
@@ -133,7 +142,7 @@ const navItems = [
   align-items: center;
   gap: 2px;
   padding: 4px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text-muted);
@@ -145,8 +154,42 @@ const navItems = [
 }
 
 .lang-toggle:hover {
-  border-color: var(--border-hover);
+  border-color: var(--border-strong);
   color: var(--text);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  line-height: 1;
+}
+
+.theme-toggle:hover {
+  border-color: var(--border-strong);
+  color: var(--accent);
+}
+
+.theme-icon {
+  display: block;
+  line-height: 1;
 }
 
 .lang-option {

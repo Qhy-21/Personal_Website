@@ -24,7 +24,7 @@ const year = new Date().getFullYear()
 .glass-footer {
   margin-top: 32px;
   padding: 16px 24px;
-  background: rgba(18, 18, 26, 0.5);
+  background: var(--bg-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
@@ -52,7 +52,7 @@ const year = new Date().getFullYear()
 }
 
 .footer-divider {
-  color: rgba(255, 255, 255, 0.15);
+  color: var(--border-strong);
 }
 
 @media (max-width: 768px) {
