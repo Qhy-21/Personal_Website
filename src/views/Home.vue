@@ -156,6 +156,18 @@ const images = computed(() =>
 const hasCarousel = computed(() => images.value.length > 0)
 const multiImage = computed(() => images.value.length > 1)
 
+const imgLoaded = ref(new Set())
+const slowTimer = ref(null)
+const showSlowHint = ref(false)
+
+function onImgLoad(idx) {
+  imgLoaded.value = new Set([...imgLoaded.value, idx])
+}
+
+function onImgError(idx) {
+  imgLoaded.value = new Set([...imgLoaded.value, idx])
+}
+
 function startCarousel() {
   stopCarousel()
   if (images.value.length > 1) {
@@ -180,6 +192,15 @@ function openInterest(item) {
   activeId.value = item.id
   currentPage.value = 0
   carouselIdx.value = 0
+  imgLoaded.value = new Set()
+  showSlowHint.value = false
+  clearTimeout(slowTimer.value)
+  slowTimer.value = setTimeout(() => {
+    const imgs = getImages(item.id)
+    if (imgs.length > 0 && imgLoaded.value.size < imgs.length) {
+      showSlowHint.value = true
+    }
+  }, 2000)
   if (getImages(item.id).length > 1) startCarousel()
 }
 
@@ -187,11 +208,36 @@ function closeInterest() {
   const wasLastOne = dismissedTags.value.size >= interestsData.length && !qrModalOpen.value
   activeId.value = null
   stopCarousel()
+  clearTimeout(slowTimer.value)
+  showSlowHint.value = false
   if (wasLastOne) {
     setTimeout(() => {
       dismissedTags.value = new Set()
       qrModalOpen.value = true
     }, 400)
+  }
+}
+
+/* ===== touch swipe carousel ===== */
+let touchStartX = 0
+let touchStartY = 0
+
+function onTouchStart(e) {
+  touchStartX = e.touches[0].clientX
+  touchStartY = e.touches[0].clientY
+}
+
+function onTouchEnd(e) {
+  if (!activeId.value || !multiImage.value) return
+  const dx = e.changedTouches[0].clientX - touchStartX
+  const dy = e.changedTouches[0].clientY - touchStartY
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+    e.preventDefault()
+    if (dx > 0) {
+      gotoImage((carouselIdx.value - 1 + images.value.length) % images.value.length)
+    } else {
+      gotoImage((carouselIdx.value + 1) % images.value.length)
+    }
   }
 }
 
@@ -294,7 +340,7 @@ onUnmounted(() => {
           <button type="button" class="interest-close" @click="closeInterest" aria-label="Close">&times;</button>
 
           <!-- Carousel -->
-          <div v-if="hasCarousel" class="carousel">
+          <div v-if="hasCarousel" class="carousel" @touchstart="onTouchStart" @touchend="onTouchEnd">
             <div class="carousel-track">
               <img
                 v-for="(img, idx) in images"
@@ -304,7 +350,12 @@ onUnmounted(() => {
                 class="carousel-img"
                 :class="{ active: idx === carouselIdx }"
                 loading="lazy"
+                @load="onImgLoad(idx)"
+                @error="onImgError(idx)"
               >
+            </div>
+            <div v-if="showSlowHint && imgLoaded.size < images.length" class="carousel-slow-hint">
+              {{ locale === 'en' ? 'Slow connection, please wait patiently~' : 'IP问题，加载缓慢，客官耐心等待呦~' }}
             </div>
             <button v-if="multiImage" type="button" class="carousel-btn carousel-prev"
               @click="gotoImage((carouselIdx - 1 + images.length) % images.length)" aria-label="Previous">&lsaquo;</button>
@@ -594,11 +645,22 @@ onUnmounted(() => {
 }
 .carousel-dot {
   width: 6px; height: 6px; border-radius: 50%;
-  background: rgba(255,255,255,0.25); cursor: pointer;
+  background: rgba(128,128,128,0.3); cursor: pointer;
   transition: all var(--duration-fast) var(--ease-out);
 }
 .carousel-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
-.carousel-dot:hover { background: rgba(255,255,255,0.5); }
+.carousel-dot:hover { background: rgba(128,128,128,0.55); }
+
+.carousel-slow-hint {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+  color: rgba(255,255,255,0.85);
+  font-size: 11px; text-align: center; white-space: nowrap;
+  z-index: 3;
+  animation: fadeIn 0.3s var(--ease-out);
+}
 
 /* ---- title & body ---- */
 .interest-modal-title {
