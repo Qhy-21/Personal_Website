@@ -90,14 +90,7 @@ const qrModalOpen = ref(false)
 
 function dismissAndOpen(item) {
   dismissedTags.value = new Set([...dismissedTags.value, item.id])
-  if (dismissedTags.value.size >= interestsData.length) {
-    setTimeout(() => {
-      dismissedTags.value = new Set()
-      qrModalOpen.value = true
-    }, 450)
-  } else {
-    openInterest(item)
-  }
+  openInterest(item)
 }
 
 function closeQrModal() {
@@ -191,8 +184,15 @@ function openInterest(item) {
 }
 
 function closeInterest() {
+  const wasLastOne = dismissedTags.value.size >= interestsData.length && !qrModalOpen.value
   activeId.value = null
   stopCarousel()
+  if (wasLastOne) {
+    setTimeout(() => {
+      dismissedTags.value = new Set()
+      qrModalOpen.value = true
+    }, 400)
+  }
 }
 
 function onKeydown(e) {
