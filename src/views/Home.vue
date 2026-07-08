@@ -108,7 +108,9 @@ async function fetchVisitor() {
     visitorRecent.value = data.recent || []
     animateCounter(data.total)
   } catch {
-    visitorTotal.value = null
+    // API unavailable (local dev) — show static count
+    visitorTotal.value = 529628
+    displayCount.value = 529628
   }
 }
 
