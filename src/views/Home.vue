@@ -77,6 +77,46 @@ function label(item) {
   return locale.value === 'en' && item.textEn ? item.textEn : item.text
 }
 
+/* ===== visitor counter ===== */
+const visitorTotal = ref(null)
+const displayCount = ref(0)
+const visitorCountries = ref([])
+const visitorRecent = ref([])
+const visitorOpen = ref(false)
+let countAnimFrame = null
+
+function animateCounter(target) {
+  if (countAnimFrame) cancelAnimationFrame(countAnimFrame)
+  const start = performance.now()
+  const duration = 1400
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1)
+    const eased = 1 - Math.pow(1 - p, 3)
+    displayCount.value = Math.round(p === 1 ? target : target * eased)
+    if (p < 1) countAnimFrame = requestAnimationFrame(tick)
+  }
+  countAnimFrame = requestAnimationFrame(tick)
+}
+
+async function fetchVisitor() {
+  try {
+    const res = await fetch('/api/visitor', { cache: 'no-store' })
+    if (!res.ok) throw new Error()
+    const data = await res.json()
+    visitorTotal.value = data.total
+    visitorCountries.value = data.countries || []
+    visitorRecent.value = data.recent || []
+    animateCounter(data.total)
+  } catch {
+    visitorTotal.value = null
+  }
+}
+
+function toggleVisitor() {
+  if (visitorTotal.value == null) return
+  visitorOpen.value = !visitorOpen.value
+}
+
 /* ===== modals ===== */
 const avatarModalOpen = ref(false)
 const activeId = ref(null)
@@ -262,10 +302,14 @@ watch(() => activeId.value ? getDesc(activeId.value) : null, () => {
   currentPage.value = 0
 })
 
-onMounted(() => document.addEventListener('keydown', onKeydown))
+onMounted(() => {
+  document.addEventListener('keydown', onKeydown)
+  fetchVisitor()
+})
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
   stopCarousel()
+  if (countAnimFrame) cancelAnimationFrame(countAnimFrame)
 })
 </script>
 
@@ -282,6 +326,19 @@ onUnmounted(() => {
         <router-link to="/projects" class="btn btn-primary">{{ t('home.viewProjects') }}</router-link>
         <router-link to="/contact" class="btn btn-ghost">{{ t('home.contactMe') }}</router-link>
       </div>
+      <button
+        v-if="displayCount > 0"
+        class="visitor-count"
+        @click="toggleVisitor"
+        :title="locale === 'en' ? 'Click to see visitor stats' : '点击查看访客统计'"
+      >
+        <span class="vc-icon">&#9672;</span>
+        {{ locale === 'en' ? `Visitor #${displayCount.toLocaleString()}` : `你是第 ${displayCount.toLocaleString()} 位访客` }}
+        <span class="vc-spark">{{ visitorTotal !== null && visitorTotal % 100 < 10 ? '✨' : '' }}</span>
+      </button>
+      <span id="busuanzi_hidden" style="display:none" aria-hidden="true">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
     </div>
 
     <div class="hero-right">
@@ -383,6 +440,49 @@ onUnmounted(() => {
     </Transition>
   </Teleport>
 
+  <!-- Visitor Stats Modal -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="visitorOpen" class="visitor-modal" @click.self="visitorOpen = false">
+        <div class="visitor-modal-inner">
+          <button type="button" class="interest-close" @click="visitorOpen = false" aria-label="Close">&times;</button>
+          <h3 class="visitor-modal-title">
+            <span class="vc-dot">&#9672;</span>
+            {{ locale === 'en' ? 'Visitor Statistics' : '访客统计' }}
+          </h3>
+          <p class="visitor-total-line">
+            {{ locale === 'en' ? 'Total visits' : '累计访客' }}
+            <strong>{{ visitorTotal?.toLocaleString() }}</strong>
+          </p>
+
+          <!-- country bars -->
+          <div v-if="visitorCountries.length" class="visitor-bars">
+            <div v-for="(c, i) in visitorCountries.slice(0, 8)" :key="c.name" class="visitor-bar-row">
+              <span class="vb-label">{{ c.name }}</span>
+              <span class="vb-track">
+                <span class="vb-fill" :style="{ width: Math.max(4, (c.count / visitorCountries[0].count) * 100) + '%' }"></span>
+              </span>
+              <span class="vb-num">{{ c.count }}</span>
+            </div>
+          </div>
+
+          <!-- recent visits -->
+          <div v-if="visitorRecent.length" class="visitor-recent">
+            <h4 class="vr-title">{{ locale === 'en' ? 'Recent Visitors' : '最近访客' }}</h4>
+            <div v-for="(r, i) in visitorRecent" :key="i" class="vr-row">
+              <span class="vr-loc">{{ r.country }}{{ r.city !== '未知' ? ' · ' + r.city : '' }}</span>
+              <span class="vr-time">{{ new Date(r.time).toLocaleString(locale === 'zh-CN' ? 'zh-CN' : 'en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) }}</span>
+            </div>
+          </div>
+
+          <p class="visitor-note">
+            {{ locale === 'en' ? 'Location based on IP approximation — may not be exact.' : '基于IP近似定位，可能与实际位置有偏差' }}
+          </p>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
   <!-- QR Code Modal -->
   <Teleport to="body">
     <Transition name="modal">
@@ -446,6 +546,157 @@ onUnmounted(() => {
 }
 
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+
+.visitor-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.visitor-count:hover {
+  color: var(--accent);
+  background: rgba(255, 128, 184, 0.08);
+}
+.vc-icon {
+  font-size: 8px;
+  color: var(--accent);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+.vc-spark { font-size: 14px; }
+
+/* ===== Visitor Stats Modal ===== */
+.visitor-modal {
+  position: fixed; inset: 0; z-index: 220;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5, 2, 8, 0.45);
+  backdrop-filter: blur(20px) saturate(140%);
+}
+.visitor-modal-inner {
+  position: relative;
+  max-width: min(420px, 92vw); width: 100%;
+  max-height: 82vh; overflow-y: auto;
+  background: var(--bg-elevated);
+  backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
+}
+.visitor-modal-title {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--accent);
+  margin: 0 0 4px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.vc-dot { font-size: 6px; animation: logoPulse 3s ease-in-out infinite; }
+
+.visitor-total-line {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 20px;
+}
+.visitor-total-line strong {
+  font-size: 28px;
+  font-family: var(--font-mono);
+  color: var(--text);
+  display: block;
+  margin-top: 4px;
+}
+
+.visitor-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.visitor-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.vb-label {
+  width: 64px;
+  font-size: 12px;
+  color: var(--text);
+  text-align: right;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vb-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-card);
+  overflow: hidden;
+}
+.vb-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  opacity: 0.7;
+  transition: width 0.6s var(--ease-out);
+}
+.vb-num {
+  width: 32px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.visitor-recent {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-bottom: 12px;
+}
+.vr-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 10px;
+}
+.vr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding: 4px 0;
+}
+.vr-loc { color: var(--text); }
+.vr-time { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; }
+
+.visitor-note {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 8px 0 0;
+  opacity: 0.6;
+}
+
+@keyframes logoPulse {
+  0%, 100% { text-shadow: 0 0 6px var(--accent-glow); }
+  50% { text-shadow: 0 0 16px var(--accent-glow), 0 0 28px var(--accent-glow); }
+}
 
 .hero-right { display: flex; flex-direction: column; gap: 16px; }
 

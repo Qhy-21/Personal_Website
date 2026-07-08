@@ -5,7 +5,7 @@
       "name": "qhy-website",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["vite", "--port", "5200", "--host"],
-      "cwd": "C:\\Users\\zhf18\\Desktop\\羌花吟の个人网站",
+      "cwd": "../羌花吟の个人网站",
       "port": 5200
     }
   ]
