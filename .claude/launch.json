@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "qhy-website",
+      "name": "qhy-dev",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["vite", "--port", "5200", "--host"],
-      "cwd": "../羌花吟の个人网站",
+      "cwd": ".",
       "port": 5200
     }
   ]

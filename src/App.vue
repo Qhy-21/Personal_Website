@@ -3,8 +3,10 @@ import { ref, watch, provide } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PixelHeader from './components/PixelHeader.vue'
 import PixelFooter from './components/PixelFooter.vue'
+import MatrixRain from './components/MatrixRain.vue'
 
 const { locale } = useI18n()
+const splashDone = ref(false)
 
 watch(locale, (val) => {
   document.documentElement.lang = val === 'en' ? 'en' : 'zh-CN'
@@ -41,17 +43,20 @@ provide('toggleTheme', toggleTheme)
 </script>
 
 <template>
-  <div class="background-stars" aria-hidden="true"></div>
-  <div class="background-grid" aria-hidden="true"></div>
-  <div v-if="wiping" class="theme-wipe" :class="wipeDir" aria-hidden="true"></div>
+  <MatrixRain @done="splashDone = true" />
+  <template v-if="splashDone">
+    <div class="background-stars" aria-hidden="true"></div>
+    <div class="background-grid" aria-hidden="true"></div>
+    <div v-if="wiping" class="theme-wipe" :class="wipeDir" aria-hidden="true"></div>
 
-  <div class="pixel-page">
-    <PixelHeader />
-    <main>
-      <router-view />
-    </main>
-    <PixelFooter />
-  </div>
+    <div class="pixel-page">
+      <PixelHeader />
+      <main>
+        <router-view />
+      </main>
+      <PixelFooter />
+    </div>
+  </template>
 </template>
 
 <style>
