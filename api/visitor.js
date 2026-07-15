@@ -88,7 +88,7 @@ export default async function handler(req, res) {
   // 兜底：Redis 不可用时退回到内存模式
   function fallbackMemory() {
     if (!fallbackMemory.store) {
-      fallbackMemory.store = { total: 1286, entries: [] }
+      fallbackMemory.store = { total: 529628, entries: [] }
     }
     const s = fallbackMemory.store
     s.total++
