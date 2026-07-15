@@ -10,6 +10,7 @@ export default async function handler(req, res) {
   const REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN
 
   if (!REST_URL || !REST_TOKEN) {
+    // 环境变量未配时 fallback 到内存模式（本地 dev 用）
     return fallbackMemory()
   }
 
@@ -29,7 +30,9 @@ export default async function handler(req, res) {
       const data = await geoRes.json()
       if (data.status === 'success') geo = { country: data.country, city: data.city }
     }
-  } catch {}
+  } catch {
+    /* ip-api unreachable */
+  }
 
   const entry = JSON.stringify({
     country: geo.country,
@@ -38,6 +41,7 @@ export default async function handler(req, res) {
   })
 
   try {
+    // 通过 pipeline 一次性执行四个 Redis 命令
     const redisRes = await fetch(`${REST_URL}/pipeline`, {
       method: 'POST',
       headers: {
@@ -45,10 +49,10 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify([
-        ['INCR', 'visitor:total'],
-        ['LPUSH', 'visitor:entries', entry],
-        ['LTRIM', 'visitor:entries', '0', '119'],
-        ['LRANGE', 'visitor:entries', '0', '14'],
+        ['INCR', 'visitor:total'],                          // total+1，返回新值
+        ['LPUSH', 'visitor:entries', entry],                 // 新条目插到列表头部
+        ['LTRIM', 'visitor:entries', '0', '119'],           // 只保留最新 120 条
+        ['LRANGE', 'visitor:entries', '0', '14'],           // 取最近 15 条
       ]),
       signal: AbortSignal.timeout(5000),
     })
@@ -63,6 +67,7 @@ export default async function handler(req, res) {
       try { return JSON.parse(r) } catch { return { country: '未知', city: '未知', time: '' } }
     })
 
+    // 从 recent 中统计国家分布
     const countryMap = {}
     recent.forEach((e) => {
       countryMap[e.country] = (countryMap[e.country] || 0) + 1
@@ -80,9 +85,10 @@ export default async function handler(req, res) {
     return fallbackMemory()
   }
 
+  // 兜底：Redis 不可用时退回到内存模式
   function fallbackMemory() {
     if (!fallbackMemory.store) {
-      fallbackMemory.store = { total: 1286, entries: [] }
+      fallbackMemory.store = { total: 529628, entries: [] }
     }
     const s = fallbackMemory.store
     s.total++
