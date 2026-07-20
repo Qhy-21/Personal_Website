@@ -5,7 +5,6 @@
       "name": "qhy-dev",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["vite", "--port", "5200", "--host"],
-      "cwd": ".",
       "port": 5200
     }
   ]

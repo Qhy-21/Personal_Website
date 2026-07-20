@@ -24,6 +24,7 @@ const navItems = [
   { path: '/projects', label: () => t('nav.projects') },
   { path: '/journal', label: () => t('nav.journal') },
   { path: '/contact', label: () => t('nav.contact') },
+  { path: '/guestbook', label: () => t('nav.guestbook') },
 ]
 </script>
 
