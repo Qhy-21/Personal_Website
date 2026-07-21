@@ -11,7 +11,6 @@
     "skills": "Skills",
     "projects": "Projects",
     "journal": "Journal",
-    "contact": "Contact",
     "guestbook": "Guestbook"
   },
   "home": {
@@ -19,13 +18,10 @@
     "greeting": "QHY",
     "subtitle": "Living Between Bit Streams",
     "intro": "A pixel cabin I built in the cracks of the internet.\nA full-stack learner who writes backend APIs and crafts frontend interfaces.",
-    "viewProjects": "View Projects",
-    "contactMe": "Contact Me",
     "version": "v2.0 · Glassmorphism Rebuild",
     "name": "Alfie",
     "role": "Java / CS / Words",
     "status": "\"Loading new possibilities…\"",
-    "learnMore": "Learn More",
     "moodLabel": "Today's Mood · PIXEL MOOD",
     "mood": "Rather than vainly reciting myriad gathas, just have a cup of tea."
   },
@@ -33,7 +29,7 @@
     "title": "About · ABOUT",
     "name": "Alfie",
     "role": "Java / Software Dev Intern",
-    "desc": "A junior CS student at Hefei Normal University.\nFull-stack developer — backend APIs and creative frontend work.",
+    "desc": "A junior CS student at Hefei ****.\nFull-stack developer — backend APIs and creative frontend work.",
     "basicInfo": "Basic Info",
     "website": "Website",
     "email": "Email",
@@ -43,7 +39,7 @@
     "school": "School",
     "locationValue": "Hefei, Anhui",
     "ageValue": "22",
-    "schoolValue": "Hefei Normal University · Software Engineering",
+    "schoolValue": "Hefei **** · Software Engineering",
     "timeline": "Timeline · TIMELINE",
     "tl2023Title": "2023 · First Code",
     "tl2023Text": "The moment I typed 'Hello, World!' on an old keyboard, the world began to change.",
@@ -53,7 +49,7 @@
     "tl2025Text": "Built Android apps and an e-commerce platform, gaining hands-on experience.",
     "tl2026Title": "Early 2026 · Full-Stack Exploration",
     "tl2026Text": "Personal website, study timer, InkSlab writing platform, EasyChat messenger — one by one.",
-    "tlNowTitle": "Now · Continuously Loading",
+    "tlNowTitle": "Now · Interning at Maxwell",
     "slogan": "Full-Stack × AI · Never Stop Learning"
   },
   "skills": {
@@ -62,7 +58,10 @@
     "mlFooter": "🎯 Continuously updating · Building AI knowledge base"
   },
   "projects": {
-    "title": "Projects · PROJECTS"
+    "title": "Projects · PROJECTS",
+    "githubWarning": "(GitHub may be restricted in some regions~ Project preview images are being planned... please be patient)",
+    "viewOnGithub": "View on GitHub",
+    "viewOnBilibili": "Watch on Bilibili"
   },
   "journal": {
     "title": "Notes · NOTES"
@@ -76,12 +75,19 @@
     "location": "Location",
     "school": "School",
     "locationValue": "Hefei, Anhui",
-    "schoolValue": "Hefei Normal University · Software Engineering",
+    "schoolValue": "Hefei **** · Software Engineering",
     "messageToFuture": "To My Future Self",
     "msg1": "Maybe one day, when you revisit this page, everything will look completely different.",
     "msg2": "But that's okay — iteration is the nature of life.",
     "msg3": "Just remember: you once built a tiny pixel room here for yourself. That's enough.",
     "viewResume": "📄 View My Resume"
+  },
+  "resume": {
+    "title": "My Resume",
+    "basicInfo": "Basic Info",
+    "techSkills": "Technical Skills",
+    "projects": "Project Experience",
+    "selfEval": "Self-Evaluation"
   },
   "footer": {
     "left": "© {year} QHY",

@@ -6,7 +6,7 @@ const routes = [
   { path: '/skills', name: 'Skills', component: () => import('../views/Skills.vue') },
   { path: '/projects', name: 'Projects', component: () => import('../views/Projects.vue') },
   { path: '/journal', name: 'Journal', component: () => import('../views/Journal.vue') },
-  { path: '/contact', name: 'Contact', component: () => import('../views/Contact.vue') },
+  { path: '/contact', redirect: '/about' },
   { path: '/guestbook', name: 'Guestbook', component: () => import('../views/Guestbook.vue') },
 ]
 

@@ -286,6 +286,7 @@ function onTouchEnd(e) {
 function onKeydown(e) {
   if (e.key === 'Escape') {
     if (qrModalOpen.value) closeQrModal()
+    else if (visitorOpen.value) visitorOpen.value = false
     else if (activeId.value) closeInterest()
     else avatarModalOpen.value = false
   }
@@ -324,10 +325,6 @@ onUnmounted(() => {
         <span class="hero-subtitle">{{ t('home.subtitle') }}</span>
       </h1>
       <p class="hero-text">{{ t('home.intro') }}</p>
-      <div class="hero-actions">
-        <router-link to="/projects" class="btn btn-primary">{{ t('home.viewProjects') }}</router-link>
-        <router-link to="/contact" class="btn btn-ghost">{{ t('home.contactMe') }}</router-link>
-      </div>
       <button
         v-if="displayCount > 0"
         class="visitor-count"
@@ -351,7 +348,6 @@ onUnmounted(() => {
           <div class="avatar-name">{{ t('home.name') }}</div>
           <div class="avatar-role">{{ t('home.role') }}</div>
           <div class="avatar-status">{{ t('home.status') }}</div>
-          <router-link to="/contact" class="btn btn-sm">{{ t('home.learnMore') }}</router-link>
         </div>
       </div>
 
@@ -546,8 +542,6 @@ onUnmounted(() => {
   margin: 0 0 20px;
   white-space: pre-line;
 }
-
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
 
 .visitor-count {
   font-family: var(--font-mono);
@@ -1013,9 +1007,5 @@ onUnmounted(() => {
   .avatar-card { grid-template-columns: 1fr; text-align: center; }
   .interest-cloud { gap: 14px 20px; padding: 20px 12px; }
   .interest-modal-inner { padding: 24px 18px 20px; }
-}
-
-@media (max-width: 480px) {
-  .hero-actions { flex-direction: column; }
 }
 </style>

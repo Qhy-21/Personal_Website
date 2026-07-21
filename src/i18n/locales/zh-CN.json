@@ -7,11 +7,10 @@
   },
   "nav": {
     "home": "首页",
-    "about": "关于我",
+    "about": "关于",
     "skills": "技能树",
     "projects": "小作品",
     "journal": "碎碎念",
-    "contact": "联络",
     "guestbook": "留言板"
   },
   "home": {
@@ -19,21 +18,18 @@
     "greeting": "羌花吟",
     "subtitle": "在比特流之间生存",
     "intro": "这是我在互联网缝隙里搭起的一间像素小屋。\n一名全栈学习者",
-    "viewProjects": "查看作品",
-    "contactMe": "联络我",
     "version": "当前版本：v2.0 · 玻璃态重构",
     "name": "羌花吟",
     "role": "Java / CS / Words",
     "status": "「正在加载新的可能性…」",
-    "learnMore": "了解更多",
     "moodLabel": "今日心情 · PIXEL MOOD",
     "mood": "空持百千偈 不如吃茶去"
   },
   "about": {
-    "title": "关于我 · ABOUT",
+    "title": "关于 · ABOUT",
     "name": "Alfie",
     "role": "Java / 软件开发实习生",
-    "desc": "一名正在合肥师范学院读大三的计算机专业学生。\n全栈开发",
+    "desc": "一名正在合肥****读大三的计算机专业学生。\n全栈开发",
     "basicInfo": "基本信息",
     "website": "个人网址",
     "email": "邮箱",
@@ -43,7 +39,7 @@
     "school": "学校",
     "locationValue": "安徽·合肥",
     "ageValue": "22岁",
-    "schoolValue": "合肥师范学院 · 软件工程",
+    "schoolValue": "合肥**** · 软件工程",
     "timeline": "时间轴 · TIMELINE",
     "tl2023Title": "2023 · 初识代码",
     "tl2023Text": "在一块旧键盘上敲下第一行「Hello, World!」的那一刻，世界开始变得不一样。",
@@ -53,7 +49,7 @@
     "tl2025Text": "完成 Android 应用与网上橱窗商城项目，开始积累实战经验。",
     "tl2026Title": "2026 上半年 · 全栈探索",
     "tl2026Text": "个人网站、学习计时器、墨笺书写平台、EasyChat 仿微信聊天等项目逐步完成。",
-    "tlNowTitle": "现在 · 持续加载中",
+    "tlNowTitle": "现在 · Maxwell公司实习中",
     "slogan": "全栈 × AI · 在学习的路上永不停歇"
   },
   "skills": {
@@ -62,7 +58,10 @@
     "mlFooter": "🎯 持续更新中 · 为 AI 构建知识体系"
   },
   "projects": {
-    "title": "小作品 · PROJECTS"
+    "title": "小作品 · PROJECTS",
+    "githubWarning": "（国内IP会有访问限制哦~ 项目预览图正在计划更新中......请耐心等候）",
+    "viewOnGithub": "在 GitHub 上查看",
+    "viewOnBilibili": "在 B站 观看"
   },
   "journal": {
     "title": "碎碎念 · NOTES"
@@ -76,12 +75,19 @@
     "location": "位置",
     "school": "学校",
     "locationValue": "安徽·合肥",
-    "schoolValue": "合肥师范学院 · 软件工程",
+    "schoolValue": "合肥**** · 软件工程",
     "messageToFuture": "给未来的自己",
     "msg1": "也许某一天，当你回来看这个页面，会发现很多地方都已经改得面目全非。",
     "msg2": "但没关系，迭代本来就是生活的常态。",
     "msg3": "只要记得，当初你给自己留过这样一间小小的像素屋子，就足够了。",
     "viewResume": "📄 查看我的简历"
+  },
+  "resume": {
+    "title": "我的简历",
+    "basicInfo": "基本信息",
+    "techSkills": "技术能力",
+    "projects": "项目经历",
+    "selfEval": "自我评价"
   },
   "footer": {
     "left": "© {year} 羌花吟",

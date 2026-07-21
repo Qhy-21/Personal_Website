@@ -5,54 +5,60 @@ const emit = defineEmits(['done'])
 const visible = ref(true)
 const fading = ref(false)
 
-// 日文片假名 + 数字 + 字母，模拟 cmatrix 字符集
-const CHARS = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
 let canvas, ctx
 let drops = []
+let fontSizes = []
 let animId = null
-const FONT_SIZE = 16
-const SPEED = 1.8 // 下落速度系数
+const AVG_FONT_SIZE = 50
+const SPEED = 0.6
+
+function randomBinary() {
+  const len = Math.floor(Math.random() * 5) + 2
+  let s = ''
+  for (let i = 0; i < len; i++) s += Math.random() > 0.5 ? '0' : '1'
+  return s
+}
 
 function initDrops() {
-  const cols = Math.floor(window.innerWidth / FONT_SIZE)
+  const cols = Math.floor(window.innerWidth / AVG_FONT_SIZE)
   drops = new Array(cols).fill(0)
-  // 随机初始位置，让启动时更有层次感
+  fontSizes = new Array(cols)
   for (let i = 0; i < cols; i++) {
-    drops[i] = Math.random() * (-window.innerHeight / FONT_SIZE)
+    drops[i] = Math.random() * (-window.innerHeight / AVG_FONT_SIZE)
+    fontSizes[i] = Math.floor(Math.random() * 34) + 14
   }
 }
 
 function draw() {
   if (!ctx) return
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.045)'
+  ctx.fillStyle = 'rgba(246, 245, 250, 0.1)'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  ctx.font = `bold ${FONT_SIZE}px "Courier New", "Source Code Pro", monospace`
-
   for (let i = 0; i < drops.length; i++) {
-    const char = CHARS[Math.floor(Math.random() * CHARS.length)]
-    const x = i * FONT_SIZE
-    const y = drops[i] * FONT_SIZE
+    const str = randomBinary()
+    const x = i * AVG_FONT_SIZE
+    const y = drops[i] * AVG_FONT_SIZE
+    const fs = fontSizes[i]
 
-    // 头部最亮（白绿），尾部渐暗
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(char, x, y)
+    ctx.font = `bold ${fs}px "JetBrains Mono", "Courier New", monospace`
 
-    ctx.fillStyle = '#86efac'
-    ctx.fillText(char, x, y - FONT_SIZE)
+    ctx.fillStyle = '#c02060'
+    ctx.fillText(str, x, y)
 
-    ctx.fillStyle = '#22c55e'
-    ctx.fillText(char, x, y - FONT_SIZE * 2)
+    ctx.fillStyle = '#d44078'
+    ctx.fillText(str, x, y - AVG_FONT_SIZE)
 
-    ctx.fillStyle = '#15803d'
-    ctx.fillText(char, x, y - FONT_SIZE * 3)
+    ctx.fillStyle = '#e87098'
+    ctx.fillText(str, x, y - AVG_FONT_SIZE * 2)
 
-    // 超出屏幕后重置到顶部随机位置
+    ctx.fillStyle = '#f5b0c8'
+    ctx.fillText(str, x, y - AVG_FONT_SIZE * 3)
+
     if (y > canvas.height && Math.random() > 0.975) {
       drops[i] = Math.random() * (-10)
+      fontSizes[i] = Math.floor(Math.random() * 34) + 14
     }
-    drops[i] += SPEED + Math.random() * 0.6
+    drops[i] += SPEED + Math.random() * 0.28
   }
   animId = requestAnimationFrame(draw)
 }
@@ -82,7 +88,6 @@ onMounted(() => {
   initDrops()
   draw()
 
-  // 3.5 秒后自动消失
   const timer = setTimeout(dismiss, 3500)
 
   window.addEventListener('resize', onResize)
@@ -105,6 +110,7 @@ onMounted(() => {
   <Transition name="matrix">
     <div v-if="visible" class="matrix-splash" :class="{ 'is-fading': fading }">
       <canvas id="matrix-canvas"></canvas>
+      <div class="matrix-glow"></div>
       <div class="matrix-overlay">
         <div class="matrix-title">QHY's Pixel World</div>
         <p class="matrix-hint">按下任意键或点击屏幕进入</p>
@@ -118,7 +124,7 @@ onMounted(() => {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #000;
+  background: #f6f5fa;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,6 +146,13 @@ onMounted(() => {
   height: 100%;
 }
 
+.matrix-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(212, 64, 120, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
 .matrix-overlay {
   position: relative;
   z-index: 1;
@@ -150,31 +163,30 @@ onMounted(() => {
 .matrix-title {
   font-family: 'Press Start 2P', monospace;
   font-size: clamp(14px, 3vw, 22px);
-  color: #22c55e;
+  color: #c02060;
   text-shadow:
-    0 0 10px rgba(34, 197, 94, 0.8),
-    0 0 30px rgba(34, 197, 94, 0.5),
-    0 0 60px rgba(34, 197, 94, 0.3);
+    0 0 10px rgba(192, 32, 96, 0.4),
+    0 0 30px rgba(192, 32, 96, 0.2);
   letter-spacing: 0.12em;
   animation: titleGlow 2s ease-in-out infinite;
   margin-bottom: 24px;
 }
 
 @keyframes titleGlow {
-  0%, 100% { text-shadow: 0 0 10px rgba(34, 197, 94, 0.6), 0 0 30px rgba(34, 197, 94, 0.3); }
-  50% { text-shadow: 0 0 16px rgba(34, 197, 94, 1), 0 0 50px rgba(34, 197, 94, 0.6), 0 0 80px rgba(34, 197, 94, 0.3); }
+  0%, 100% { text-shadow: 0 0 10px rgba(192, 32, 96, 0.3), 0 0 30px rgba(192, 32, 96, 0.15); }
+  50% { text-shadow: 0 0 16px rgba(192, 32, 96, 0.6), 0 0 50px rgba(212, 64, 120, 0.3), 0 0 80px rgba(212, 64, 120, 0.12); }
 }
 
 .matrix-hint {
   font-family: 'Press Start 2P', monospace;
   font-size: 9px;
-  color: rgba(34, 197, 94, 0.7);
+  color: rgba(192, 32, 96, 0.5);
   letter-spacing: 0.08em;
   animation: hintBlink 2.5s ease-in-out infinite;
 }
 
 @keyframes hintBlink {
-  0%, 100% { opacity: 0.35; }
+  0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
 }
 

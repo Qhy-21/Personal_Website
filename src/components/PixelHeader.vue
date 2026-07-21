@@ -19,11 +19,10 @@ watch(locale, (val) => {
 
 const navItems = [
   { path: '/', label: () => t('nav.home') },
-  { path: '/about', label: () => t('nav.about') },
   { path: '/skills', label: () => t('nav.skills') },
   { path: '/projects', label: () => t('nav.projects') },
   { path: '/journal', label: () => t('nav.journal') },
-  { path: '/contact', label: () => t('nav.contact') },
+  { path: '/about', label: () => t('nav.about') },
   { path: '/guestbook', label: () => t('nav.guestbook') },
 ]
 </script>
