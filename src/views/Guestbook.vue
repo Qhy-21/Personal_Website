@@ -14,7 +14,7 @@ const walineLang = computed(() => locale.value === 'zh-CN' ? 'zh-CN' : 'en')
     <h2 class="section-title">{{ $t('nav.guestbook') }}</h2>
     <div class="pixel-card waline-card">
       <Waline
-        serverURL="https://leaveamessage-three.vercel.app/"
+        serverURL="https://leaveamessage.qhy-alfie.work/"
         path="/guestbook"
         :lang="walineLang"
         dark="html[data-theme='dark']"
