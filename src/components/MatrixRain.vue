@@ -7,10 +7,12 @@ const fading = ref(false)
 
 let canvas, ctx
 let drops = []
+let depths = []
+let speeds = []
+let alphas = []
 let fontSizes = []
 let animId = null
-const AVG_FONT_SIZE = 50
-const SPEED = 0.6
+const COL_GAP = 30
 
 function randomBinary() {
   const len = Math.floor(Math.random() * 5) + 2
@@ -19,46 +21,69 @@ function randomBinary() {
   return s
 }
 
+function columnFromDepth() {
+  const depth = Math.random() * 0.88 + 0.12
+  return {
+    depth,
+    y: Math.random() * (-window.innerHeight / COL_GAP),
+    fs: Math.round(6 + depth * 54),
+    speed: 0.05 + depth * 0.45,
+    alpha: 0.06 + depth * 0.5,
+  }
+}
+
 function initDrops() {
-  const cols = Math.floor(window.innerWidth / AVG_FONT_SIZE)
-  drops = new Array(cols).fill(0)
+  const cols = Math.floor(window.innerWidth / COL_GAP)
+  drops = new Array(cols)
+  depths = new Array(cols)
+  speeds = new Array(cols)
+  alphas = new Array(cols)
   fontSizes = new Array(cols)
   for (let i = 0; i < cols; i++) {
-    drops[i] = Math.random() * (-window.innerHeight / AVG_FONT_SIZE)
-    fontSizes[i] = Math.floor(Math.random() * 34) + 14
+    const c = columnFromDepth()
+    drops[i] = c.y
+    depths[i] = c.depth
+    speeds[i] = c.speed
+    alphas[i] = c.alpha
+    fontSizes[i] = c.fs
   }
 }
 
 function draw() {
   if (!ctx) return
-  ctx.fillStyle = 'rgba(246, 245, 250, 0.1)'
+  ctx.fillStyle = 'rgba(246, 245, 250, 0.08)'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
   for (let i = 0; i < drops.length; i++) {
     const str = randomBinary()
-    const x = i * AVG_FONT_SIZE
-    const y = drops[i] * AVG_FONT_SIZE
+    const x = i * COL_GAP
+    const y = drops[i] * COL_GAP
     const fs = fontSizes[i]
+    const a = alphas[i]
 
-    ctx.font = `bold ${fs}px "JetBrains Mono", "Courier New", monospace`
+    ctx.font = `${fs}px "JetBrains Mono", "Courier New", monospace`
 
-    ctx.fillStyle = '#c02060'
+    ctx.fillStyle = `rgba(212, 64, 120, ${a})`
     ctx.fillText(str, x, y)
 
-    ctx.fillStyle = '#d44078'
-    ctx.fillText(str, x, y - AVG_FONT_SIZE)
+    ctx.fillStyle = `rgba(212, 64, 120, ${a * 0.55})`
+    ctx.fillText(str, x, y - COL_GAP)
 
-    ctx.fillStyle = '#e87098'
-    ctx.fillText(str, x, y - AVG_FONT_SIZE * 2)
+    ctx.fillStyle = `rgba(212, 64, 120, ${a * 0.25})`
+    ctx.fillText(str, x, y - COL_GAP * 2)
 
-    ctx.fillStyle = '#f5b0c8'
-    ctx.fillText(str, x, y - AVG_FONT_SIZE * 3)
+    ctx.fillStyle = `rgba(212, 64, 120, ${a * 0.1})`
+    ctx.fillText(str, x, y - COL_GAP * 3)
 
     if (y > canvas.height && Math.random() > 0.975) {
-      drops[i] = Math.random() * (-10)
-      fontSizes[i] = Math.floor(Math.random() * 34) + 14
+      const c = columnFromDepth()
+      drops[i] = Math.random() * (-6)
+      depths[i] = c.depth
+      speeds[i] = c.speed
+      alphas[i] = c.alpha
+      fontSizes[i] = c.fs
     }
-    drops[i] += SPEED + Math.random() * 0.28
+    drops[i] += speeds[i]
   }
   animId = requestAnimationFrame(draw)
 }
