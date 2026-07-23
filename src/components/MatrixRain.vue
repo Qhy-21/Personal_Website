@@ -12,7 +12,7 @@ let speeds = []
 let alphas = []
 let fontSizes = []
 let animId = null
-const COL_GAP = 30
+const COL_GAP = 22
 
 function randomBinary() {
   const len = Math.floor(Math.random() * 5) + 2
@@ -51,8 +51,7 @@ function initDrops() {
 
 function draw() {
   if (!ctx) return
-  ctx.fillStyle = 'rgba(246, 245, 250, 0.08)'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   for (let i = 0; i < drops.length; i++) {
     const str = randomBinary()
@@ -62,18 +61,11 @@ function draw() {
     const a = alphas[i]
 
     ctx.font = `${fs}px "JetBrains Mono", "Courier New", monospace`
-
     ctx.fillStyle = `rgba(212, 64, 120, ${a})`
-    ctx.fillText(str, x, y)
 
-    ctx.fillStyle = `rgba(212, 64, 120, ${a * 0.55})`
-    ctx.fillText(str, x, y - COL_GAP)
-
-    ctx.fillStyle = `rgba(212, 64, 120, ${a * 0.25})`
-    ctx.fillText(str, x, y - COL_GAP * 2)
-
-    ctx.fillStyle = `rgba(212, 64, 120, ${a * 0.1})`
-    ctx.fillText(str, x, y - COL_GAP * 3)
+    for (let j = 0; j < str.length; j++) {
+      ctx.fillText(str[j], x, y + j * fs)
+    }
 
     if (y > canvas.height && Math.random() > 0.975) {
       const c = columnFromDepth()
