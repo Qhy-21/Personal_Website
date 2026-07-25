@@ -24,6 +24,7 @@ const navItems = [
   { path: '/journal', label: () => t('nav.journal') },
   { path: '/about', label: () => t('nav.about') },
   { path: '/guestbook', label: () => t('nav.guestbook') },
+  { path: '/xusong-bot', label: () => t('nav.xusongBot') },
 ]
 </script>
 

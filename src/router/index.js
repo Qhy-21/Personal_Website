@@ -8,6 +8,7 @@ const routes = [
   { path: '/journal', name: 'Journal', component: () => import('../views/Journal.vue') },
   { path: '/contact', redirect: '/about' },
   { path: '/guestbook', name: 'Guestbook', component: () => import('../views/Guestbook.vue') },
+  { path: '/xusong-bot', name: 'XusongBot', component: () => import('../views/XusongBot.vue') },
 ]
 
 const router = createRouter({
