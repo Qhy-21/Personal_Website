@@ -189,17 +189,17 @@ function confirmDesc(type) {
         </div>
       </div>
 
-      <h3 class="section-title">{{ t('xusongBot.bracketTitle') }}</h3>
-      <div ref="bracketRef">
-        <BracketTree :all-rounds="allRounds" />
-      </div>
-
       <div class="action-bar complete-actions">
         <button class="bot-btn primary" @click="handleRestart">{{ t('xusongBot.restart') }}</button>
         <button class="bot-btn" @click="handleExport" :disabled="exporting">
           {{ exporting ? '...' : t('xusongBot.exportImage') }}
         </button>
         <button class="bot-btn danger" @click="handleClear">{{ t('xusongBot.clearAll') }}</button>
+      </div>
+
+      <h3 class="section-title">{{ t('xusongBot.bracketTitle') }}</h3>
+      <div ref="bracketRef">
+        <BracketTree :all-rounds="allRounds" />
       </div>
     </div>
 
@@ -276,6 +276,8 @@ function confirmDesc(type) {
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .stat-item.accent {
@@ -355,6 +357,8 @@ function confirmDesc(type) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .bot-btn:hover:not(:disabled) {
@@ -581,12 +585,12 @@ function confirmDesc(type) {
   }
 
   .action-bar {
-    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .bot-btn {
-    font-size: 13px;
-    padding: 8px 16px;
+    font-size: 12px;
+    padding: 6px 12px;
   }
 
   .stats-row {
@@ -594,7 +598,11 @@ function confirmDesc(type) {
   }
 
   .complete-phase {
-    padding: 0 8px;
+    padding: 0 12px;
+  }
+
+  .live-bracket-body {
+    max-height: 220px;
   }
 
   .confirm-card {

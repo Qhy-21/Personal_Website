@@ -119,7 +119,9 @@
     "confirmClearDesc": "Clear all voting records? This cannot be undone.",
     "confirmYes": "Confirm",
     "confirmCancel": "Cancel",
-    "liveBracket": "▼ Progress ({n} rounds done)"
+    "liveBracket": "▼ Progress ({n} rounds done)",
+    "showAllRounds": "Show all {n} rounds",
+    "collapseAll": "Collapse All"
   },
   "resume": {
     "title": "My Resume",

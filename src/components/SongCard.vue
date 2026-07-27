@@ -80,18 +80,25 @@ defineEmits(['pick'])
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .song-title {
   font-weight: 600;
   font-size: 17px;
   line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .song-meta {
   font-size: 12px;
   color: var(--text-muted);
   font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .outcome-badge {
@@ -116,7 +123,7 @@ defineEmits(['pick'])
 
 @media (max-width: 768px) {
   .song-card {
-    padding: 14px 16px;
+    padding: 12px 14px;
   }
   .song-title {
     font-size: 15px;
