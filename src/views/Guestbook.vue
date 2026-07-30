@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Waline } from '@waline/client/component'
 import '@waline/client/style'
+import EmojiPicker from '../components/EmojiPicker.vue'
 
 const { locale } = useI18n()
 
@@ -13,12 +14,13 @@ const walineLang = computed(() => locale.value === 'zh-CN' ? 'zh-CN' : 'en')
   <section class="section">
     <h2 class="section-title">{{ $t('nav.guestbook') }}</h2>
     <div class="pixel-card waline-card">
+      <EmojiPicker />
       <Waline
         serverURL="https://leaveamessage.qhy-alfie.work/"
         path="/guestbook"
         :lang="walineLang"
         dark="html[data-theme='dark']"
-        :emoji="['//unpkg.com/@waline/emojis@1.1.0/weibo']"
+        :emoji="[]"
         :requiredMeta="['nick']"
         :wordLimit="500"
         :pageSize="10"
@@ -137,5 +139,33 @@ const walineLang = computed(() => locale.value === 'zh-CN' ? 'zh-CN' : 'en')
 
 [data-theme="light"] .waline-card .wl-card .wl-content.expand::before {
   background: linear-gradient(180deg, transparent, var(--bg-card));
+}
+
+/* Fix emoji rendering in Waline textarea / inputs on Windows */
+.waline-card .wl-editor,
+.waline-card .wl-input {
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', var(--font-body);
+}
+
+/* Hide Waline built-in emoji button — replaced by EmojiPicker */
+.waline-card .wl-emoji {
+  display: none;
+}
+
+/* Hide Waline preview button and Markdown guide link */
+.waline-card .wl-action[title="预览"],
+.waline-card .wl-action[href*="guides.github.com"] {
+  display: none;
+}
+
+/* Hide Waline image upload button */
+.waline-card label[title="上传图片"],
+.waline-card .wl-upload {
+  display: none;
+}
+
+/* Hide Waline RSS subscribe and Powered by footer */
+.waline-card .wl-meta-foot {
+  display: none;
 }
 </style>
