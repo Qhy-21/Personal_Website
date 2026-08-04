@@ -1,7 +1,7 @@
 node_modules
 dist
 backend
-frontend
+_archive
 data.db
 *.log
 .DS_Store

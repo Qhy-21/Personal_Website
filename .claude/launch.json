@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["vite", "--port", "5199", "--host"],
       "port": 5199
+    },
+    {
+      "name": "resume-preview",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8899", "--directory", "C:/Users/zhf18/Desktop/羌花吟の个人网站/_archive/frontend/dist"],
+      "port": 8899
     }
   ]
 }

@@ -9,7 +9,7 @@
     "home": "首页",
     "about": "关于",
     "skills": "技能树",
-    "projects": "小作品",
+    "projects": "项目",
     "journal": "碎碎念",
     "guestbook": "留言板",
     "xusongBot": "许嵩bot"
@@ -29,8 +29,8 @@
   "about": {
     "title": "关于 · ABOUT",
     "name": "Alfie",
-    "role": "Java / 软件开发实习生",
-    "desc": "一名正在合肥****读大三的计算机专业学生。\n全栈开发",
+    "role": "AI应用开发 | Java全栈开发 | agent",
+    "desc": "\n全栈开发",
     "basicInfo": "基本信息",
     "website": "个人网址",
     "email": "邮箱",
@@ -59,7 +59,7 @@
     "mlFooter": "🎯 持续更新中 · 为 AI 构建知识体系"
   },
   "projects": {
-    "title": "小作品 · PROJECTS",
+    "title": "项目 · PROJECTS",
     "githubWarning": "（国内IP会有访问限制哦~ 项目预览图正在计划更新中......请耐心等候）",
     "viewOnGithub": "在 GitHub 上查看",
     "viewOnBilibili": "在 B站 观看"
@@ -78,10 +78,8 @@
     "locationValue": "安徽·合肥",
     "schoolValue": "合肥**** · 软件工程",
     "messageToFuture": "给未来的自己",
-    "msg1": "也许某一天，当你回来看这个页面，会发现很多地方都已经改得面目全非。",
-    "msg2": "但没关系，迭代本来就是生活的常态。",
-    "msg3": "只要记得，当初你给自己留过这样一间小小的像素屋子，就足够了。",
-    "viewResume": "📄 查看我的简历"
+    "msg1": "也许某天，当你回来，会发现很多地方早已面目全非。",
+    "msg2": "但没关系，迭代本就是生活常态。"
   },
   "xusongBot": {
     "title": "许嵩 bot",
