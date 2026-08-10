@@ -35,12 +35,12 @@ export default {
     { id: "hepai", title: "合拍", year: "2023" },
     { id: "xinyousuoxiang", title: "心有所向", year: "2023" },
     { id: "zhiyouni", title: "只有你", year: "2023" },
-    { id: "rumi", title: "入迷", year: "2023" },
+    { id: "rumi", title: "如迷", year: "2023" },
     { id: "fallinginlove", title: "Falling In Love", year: "2024" },
     { id: "huapingsheng", title: "画平生", year: "2024" },
     { id: "zaofabaidicheng", title: "早发白帝城", year: "2024" },
     { id: "jiangxinbixin", title: "将芯比心", year: "2024" },
     { id: "yelu", title: "野路", year: "2025" },
-    { id: "lanxiange", title: "拦仙歌", year: "2025" }
+    { id: "lanxiange", title: "揽仙歌", year: "2025" }
   ],
 }

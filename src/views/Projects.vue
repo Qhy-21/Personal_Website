@@ -260,16 +260,6 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 }
 .interest-close:hover { color: var(--text); background: rgba(128,128,128,0.1); }
 
-/* ===== transitions ===== */
-.modal-enter-active { transition: opacity 0.2s ease; }
-.modal-leave-active { transition: opacity 0.15s ease; }
-.modal-enter-from, .modal-leave-to { opacity: 0; }
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @media (max-width: 480px) {
   .project-grid { grid-template-columns: 1fr; }
   .project-modal-inner { padding: 24px 18px 20px; }

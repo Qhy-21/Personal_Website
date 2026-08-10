@@ -5,18 +5,9 @@ import interestsData from '../data/interests.js'
 import InterestModal from '../components/InterestModal.vue'
 import VisitorStats from '../components/VisitorStats.vue'
 import { AVATAR } from '../constants/assets.js'
+import { shuffle } from '../utils/shuffle.js'
 
 const { t, locale } = useI18n()
-
-/* ===== shuffle ===== */
-function shuffle(arr) {
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
 
 const shuffled = shuffle(interestsData)
 
@@ -150,7 +141,7 @@ onUnmounted(() => {
         :title="locale === 'en' ? 'Click to see visitor stats' : '点击查看访客统计'"
       >
         <span class="vc-icon">&#9672;</span>
-        {{ locale === 'en' ? `Visitor #${displayCount.toLocaleString()}` : `你是第 ${displayCount.toLocaleString()} 位访客` }}
+        {{ t('home.visitorCount', { n: displayCount.toLocaleString() }) }}
         <span class="vc-spark">{{ visitorTotal !== null && visitorTotal % 100 < 10 ? '✨' : '' }}</span>
       </button>
     </div>
@@ -225,7 +216,7 @@ onUnmounted(() => {
         <div class="qr-modal-inner">
           <button type="button" class="qr-close" @click="closeQrModal" aria-label="Close">&times;</button>
           <img src="/wechat-qr.jpg" alt="WeChat QR Code" class="qr-image">
-          <p class="qr-text">{{ locale === 'en' ? "Now you know all about me. Maybe you'd like to be friends?" : '了解完全部，也许你想和我成为朋友。' }}</p>
+          <p class="qr-text">{{ t('home.qrFriendText') }}</p>
         </div>
       </div>
     </Transition>
@@ -306,11 +297,6 @@ onUnmounted(() => {
   animation: logoPulse 3s ease-in-out infinite;
 }
 .vc-spark { font-size: 14px; }
-
-@keyframes logoPulse {
-  0%, 100% { text-shadow: 0 0 6px var(--accent-glow); }
-  50% { text-shadow: 0 0 16px var(--accent-glow), 0 0 28px var(--accent-glow); }
-}
 
 .hero-right { display: flex; flex-direction: column; gap: 16px; }
 
@@ -475,16 +461,6 @@ onUnmounted(() => {
   font-size: 15px; line-height: 1.7;
   color: var(--text-muted); margin: 0;
 }
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== transitions ===== */
-.modal-enter-active { transition: opacity 0.2s ease; }
-.modal-leave-active { transition: opacity 0.15s ease; }
-.modal-enter-from, .modal-leave-to { opacity: 0; }
 
 /* ===== responsive ===== */
 @media (max-width: 768px) {

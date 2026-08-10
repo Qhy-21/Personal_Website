@@ -3,7 +3,9 @@
     "title": "羌花吟の个人网站",
     "tagline": "在比特流之间生存",
     "loading": "加载中...",
-    "loadingSub": "在比特流之间生存"
+    "loadingSub": "在比特流之间生存",
+    "splashTitle": "QHY's Pixel World",
+    "splashHint": "按下任意键或点击屏幕进入"
   },
   "nav": {
     "home": "首页",
@@ -24,7 +26,10 @@
     "role": "Java / CS / Words",
     "status": "「正在加载新的可能性…」",
     "moodLabel": "今日心情 · PIXEL MOOD",
-    "mood": "空持百千偈 不如吃茶去"
+    "mood": "空持百千偈 不如吃茶去",
+    "visitorCount": "你是第 {n} 位访客",
+    "qrFriendText": "了解完全部，也许你想和我成为朋友。",
+    "interestSlowHint": "IP问题，加载缓慢，客官耐心等待呦~"
   },
   "about": {
     "title": "关于 · ABOUT",
@@ -65,7 +70,18 @@
     "viewOnBilibili": "在 B站 观看"
   },
   "journal": {
-    "title": "碎碎念 · NOTES"
+    "title": "碎碎念 · NOTES",
+    "essays": "文章",
+    "essaysSub": "随笔 · 小说 · 杂记",
+    "poems": "诗歌",
+    "poemsSub": "自由诗 · 分行 · 节奏",
+    "toc": "目录",
+    "tocToggle": "收起目录",
+    "backToJournal": "返回碎碎念",
+    "backToList": "返回列表",
+    "noContent": "暂无内容，敬请期待",
+    "publishedOn": "发布于",
+    "hint": "选择一本，翻开看看"
   },
   "contact": {
     "title": "联络方式 · CONTACT",

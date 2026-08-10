@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const emit = defineEmits(['done'])
 const visible = ref(true)
 const fading = ref(false)
@@ -129,8 +131,8 @@ onMounted(() => {
       <canvas id="matrix-canvas"></canvas>
       <div class="matrix-glow"></div>
       <div class="matrix-overlay">
-        <div class="matrix-title">QHY's Pixel World</div>
-        <p class="matrix-hint">按下任意键或点击屏幕进入</p>
+        <div class="matrix-title">{{ t('site.splashTitle') }}</div>
+        <p class="matrix-hint">{{ t('site.splashHint') }}</p>
       </div>
     </div>
   </Transition>

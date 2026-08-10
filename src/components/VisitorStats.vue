@@ -94,11 +94,6 @@ const emit = defineEmits(['close'])
 }
 .vc-dot { font-size: 6px; animation: logoPulse 3s ease-in-out infinite; }
 
-@keyframes logoPulse {
-  0%, 100% { text-shadow: 0 0 6px var(--accent-glow); }
-  50% { text-shadow: 0 0 16px var(--accent-glow), 0 0 28px var(--accent-glow); }
-}
-
 .visitor-total-line {
   text-align: center;
   font-size: 13px;
@@ -187,7 +182,4 @@ const emit = defineEmits(['close'])
   opacity: 0.6;
 }
 
-.modal-enter-active { transition: opacity 0.2s ease; }
-.modal-leave-active { transition: opacity 0.15s ease; }
-.modal-enter-from, .modal-leave-to { opacity: 0; }
 </style>

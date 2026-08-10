@@ -274,6 +274,16 @@ a:hover { color: var(--accent-strong); }
   to { opacity: 1; transform: translateX(0); }
 }
 
+@keyframes logoPulse {
+  0%, 100% { text-shadow: 0 0 6px var(--accent-glow); }
+  50% { text-shadow: 0 0 16px var(--accent-glow), 0 0 28px var(--accent-glow); }
+}
+
+/* Shared modal transition — use class="modal-transition" on <Transition name="modal"> */
+.modal-enter-active { transition: opacity 0.2s ease; }
+.modal-leave-active { transition: opacity 0.15s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+
 /* ===== Scrollbar ===== */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }

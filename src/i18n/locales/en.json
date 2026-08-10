@@ -3,7 +3,9 @@
     "title": "QHY's Pixel World",
     "tagline": "Living Between Bit Streams",
     "loading": "Loading...",
-    "loadingSub": "Living Between Bit Streams"
+    "loadingSub": "Living Between Bit Streams",
+    "splashTitle": "QHY's Pixel World",
+    "splashHint": "Press any key or click to enter"
   },
   "nav": {
     "home": "Home",
@@ -24,7 +26,10 @@
     "role": "Java / CS / Words",
     "status": "\"Loading new possibilities…\"",
     "moodLabel": "Today's Mood · PIXEL MOOD",
-    "mood": "Rather than vainly reciting myriad gathas, just have a cup of tea."
+    "mood": "Rather than vainly reciting myriad gathas, just have a cup of tea.",
+    "visitorCount": "Visitor #{n}",
+    "qrFriendText": "Now you know all about me. Maybe you'd like to be friends?",
+    "interestSlowHint": "Slow connection, please wait patiently~"
   },
   "about": {
     "title": "About · ABOUT",
@@ -65,7 +70,18 @@
     "viewOnBilibili": "Watch on Bilibili"
   },
   "journal": {
-    "title": "Notes · NOTES"
+    "title": "Notes · NOTES",
+    "essays": "Essays",
+    "essaysSub": "Prose · Fiction · Notes",
+    "poems": "Poems",
+    "poemsSub": "Free Verse · Lines · Rhythm",
+    "toc": "Contents",
+    "tocToggle": "Hide TOC",
+    "backToJournal": "Back to Journal",
+    "backToList": "Back to List",
+    "noContent": "No content yet, stay tuned",
+    "publishedOn": "Published on",
+    "hint": "Pick one and flip through it"
   },
   "contact": {
     "title": "Contact · CONTACT",

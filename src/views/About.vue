@@ -585,12 +585,6 @@ const { t } = useI18n()
   margin-bottom: 0;
 }
 
-/* ===== Animations ===== */
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-16px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .about-grid-two {

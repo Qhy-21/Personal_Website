@@ -213,7 +213,7 @@ onUnmounted(() => {
               >
             </div>
             <div v-if="showSlowHint && imgLoaded.size < images.length" class="carousel-slow-hint">
-              {{ locale === 'en' ? 'Slow connection, please wait patiently~' : 'IP问题，加载缓慢，客官耐心等待呦~' }}
+              {{ $t('home.interestSlowHint') }}
             </div>
             <button v-if="multiImage" type="button" class="carousel-btn carousel-prev"
               @click="gotoImage((carouselIdx - 1 + images.length) % images.length)" aria-label="Previous">&lsaquo;</button>
@@ -333,8 +333,6 @@ onUnmounted(() => {
   animation: fadeIn 0.3s var(--ease-out);
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
 .interest-modal-title {
   font-family: var(--font-pixel); font-size: 14px;
   color: var(--accent); margin: 0 0 16px; text-align: center;
@@ -384,10 +382,6 @@ onUnmounted(() => {
   font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
   min-width: 48px; text-align: center;
 }
-
-.modal-enter-active { transition: opacity 0.2s ease; }
-.modal-leave-active { transition: opacity 0.15s ease; }
-.modal-enter-from, .modal-leave-to { opacity: 0; }
 
 @media (max-width: 768px) {
   .interest-modal-inner { padding: 24px 18px 20px; }
