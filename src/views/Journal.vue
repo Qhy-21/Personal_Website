@@ -11,6 +11,11 @@ const { t } = useI18n()
 
     <div class="bookshelf">
       <BookCover
+        type="articles"
+        :coverTitle="t('journal.articles')"
+        :coverSubtitle="t('journal.articlesSub')"
+      />
+      <BookCover
         type="essays"
         :coverTitle="t('journal.essays')"
         :coverSubtitle="t('journal.essaysSub')"
@@ -47,15 +52,16 @@ const { t } = useI18n()
 .bookshelf {
   display: flex;
   justify-content: center;
-  gap: 48px;
+  gap: 40px;
   padding: 20px 0 8px;
+  flex-wrap: wrap;
 }
 
 .bookshelf-hint {
   text-align: center;
   font-size: 11px;
   color: var(--text-muted);
-  margin-top: 24px;
+  margin-top: 32px;
   opacity: 0.45;
   font-family: var(--font-mono);
   letter-spacing: 0.06em;
@@ -65,7 +71,7 @@ const { t } = useI18n()
   .bookshelf {
     flex-direction: column;
     align-items: center;
-    gap: 32px;
+    gap: 44px;
   }
 
   .journal-landing::before {

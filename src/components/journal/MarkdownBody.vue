@@ -1,15 +1,58 @@
 <script setup>
-import { renderMarkdown } from '../../composables/useJournal.js'
+import MarkdownIt from 'markdown-it'
+import { computed, watch, ref } from 'vue'
 
 const props = defineProps({
   content: { type: String, required: true },
+  category: { type: String, default: '' },
 })
 
-const html = renderMarkdown(props.content)
+// 根据分类绑定 body 类名（articles / essays / poems）
+const categoryClass = computed(() => {
+  if (props.category === 'poems') return 'poem-body'
+  if (props.category === 'essays') return 'essay-body'
+  if (props.category === 'articles') return 'article-body'
+  return ''
+})
+
+// 构建带 id 锚点的 md 渲染器
+const md = new MarkdownIt({
+  html: false,
+  breaks: true,
+  typographer: true,
+})
+
+// 提取文本 -> slug（用于标题锚点）
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .replace(/<[^>]*>/g, '')
+    .replace(/[^\w一-鿿\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+// 自定义 heading 渲染规则 -> 注入 id（便于 #锚点 跳转）
+md.renderer.rules.heading_open = (tokens, idx) => {
+  const token = tokens[idx]
+  const inlineToken = tokens[idx + 1]
+  const text = inlineToken && inlineToken.type === 'inline' ? inlineToken.content : ''
+  const id = slugify(text)
+  return `<${token.tag} id="${id}">`
+}
+
+const html = ref('')
+
+function render() {
+  html.value = props.content ? md.render(props.content) : ''
+}
+
+watch(() => props.content, render, { immediate: true })
 </script>
 
 <template>
-  <div class="markdown-body" v-html="html"></div>
+  <div class="markdown-body" :class="categoryClass" v-html="html"></div>
 </template>
 
 <style scoped>
@@ -55,9 +98,11 @@ const html = renderMarkdown(props.content)
   margin-top: 0;
 }
 
-/* Paragraphs */
+/* Paragraphs —— 默认（文章 / 通用）：首行缩进 2 字符 + 略增行距 */
 .markdown-body :deep(p) {
-  margin: 0 0 16px;
+  margin: 0 0 18px;
+  text-indent: 2em;
+  line-height: 1.95;
 }
 
 /* Strong & Em */
@@ -110,6 +155,7 @@ const html = renderMarkdown(props.content)
 
 .markdown-body :deep(blockquote p) {
   margin: 0;
+  text-indent: 0;
 }
 
 /* Lists */
@@ -176,6 +222,23 @@ const html = renderMarkdown(props.content)
 
 .markdown-body :deep(tr:nth-child(even) td) {
   background: rgba(128, 128, 128, 0.03);
+}
+
+/* 诗歌排版：无首行缩进，段间距更宽，行距更舒展 */
+.markdown-body.poem-body :deep(p) {
+  margin: 0 0 20px;
+  text-indent: 0;
+  line-height: 2.1;
+}
+
+/* 随笔排版：保留首行缩进，行距稍大 */
+.markdown-body.essay-body :deep(p) {
+  line-height: 2.0;
+}
+
+/* 文章排版：与默认一致，明确声明 */
+.markdown-body.article-body :deep(p) {
+  line-height: 1.95;
 }
 
 @media (max-width: 768px) {

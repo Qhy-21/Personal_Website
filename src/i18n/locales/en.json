@@ -71,8 +71,10 @@
   },
   "journal": {
     "title": "Notes · NOTES",
+    "articles": "Articles",
+    "articlesSub": "Stories · Fiction · Essays",
     "essays": "Essays",
-    "essaysSub": "Prose · Fiction · Notes",
+    "essaysSub": "Thoughts · Jottings · Sparks",
     "poems": "Poems",
     "poemsSub": "Free Verse · Lines · Rhythm",
     "toc": "Contents",
