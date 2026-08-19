@@ -8,7 +8,7 @@
 //   articles: 3            // 按序号（打开第 3 篇）
 //   poems: ''
 export const defaultEntries = {
-  articles: '15',
+  articles: '14',
   essays: '53',
   poems: '',
 }
