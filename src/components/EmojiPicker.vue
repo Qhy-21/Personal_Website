@@ -1,5 +1,8 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
 
 let show = false
 
@@ -27,10 +30,23 @@ let toggleBtn = null
 let panel = null
 let stop = null
 
+function updateLabels() {
+  const english = locale.value === 'en'
+  if (toggleBtn) {
+    toggleBtn.title = english ? 'Choose an emoji' : '选择表情'
+    toggleBtn.setAttribute('aria-label', toggleBtn.title)
+  }
+  panel?.querySelectorAll('button').forEach(btn => {
+    btn.title = `${english ? 'Insert emoji' : '插入表情'} ${btn.textContent}`
+    btn.setAttribute('aria-label', btn.title)
+  })
+}
+
+watch(locale, updateLabels)
+
 function build() {
   toggleBtn = document.createElement('button')
   toggleBtn.className = 'emoji-toggle'
-  toggleBtn.title = '表情'
   toggleBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>'
   toggleBtn.addEventListener('click', (e) => {
     e.preventDefault()
@@ -50,6 +66,7 @@ function build() {
     btn.addEventListener('click', () => insert(e))
     panel.appendChild(btn)
   }
+  updateLabels()
 }
 
 function inject() {

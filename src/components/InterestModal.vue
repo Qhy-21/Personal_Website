@@ -1,11 +1,18 @@
 <script setup>
 import { ref, computed, watch, onUnmounted } from 'vue'
+import { useDialog } from '../composables/useDialog'
 
 const props = defineProps({
   interest: { type: Object, default: null },
   locale: { type: String, required: true },
 })
 const emit = defineEmits(['close'])
+const modalOpen = computed({
+  get: () => Boolean(props.interest),
+  set: (value) => { if (!value) emit('close') },
+})
+const { dialogRef } = useDialog(modalOpen)
+const carouselPlaying = ref(false)
 
 /* ===== glob auto-discovery ===== */
 const descModules = import.meta.glob('../data/interests/*/desc.md', { query: '?raw', import: 'default', eager: true })
@@ -121,7 +128,8 @@ function onImgError(idx) {
 
 function startCarousel() {
   stopCarousel()
-  if (images.value.length > 1) {
+  if (images.value.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    carouselPlaying.value = true
     carouselTimer = setInterval(() => {
       carouselIdx.value = (carouselIdx.value + 1) % images.value.length
     }, 3500)
@@ -130,12 +138,14 @@ function startCarousel() {
 
 function stopCarousel() {
   if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null }
+  carouselPlaying.value = false
 }
 
 function gotoImage(idx) {
+  const wasPlaying = carouselPlaying.value
   stopCarousel()
   carouselIdx.value = idx
-  startCarousel()
+  if (wasPlaying) startCarousel()
 }
 
 /* ===== touch swipe ===== */
@@ -163,6 +173,7 @@ function onTouchEnd(e) {
 
 /* ===== init / reset ===== */
 watch(() => props.interest, (item) => {
+  stopCarousel()
   currentPage.value = 0
   carouselIdx.value = 0
   imgLoaded.value = new Set()
@@ -194,8 +205,8 @@ onUnmounted(() => {
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="interest" class="interest-modal" @click.self="emit('close')">
-        <div class="interest-modal-inner">
-          <button type="button" class="interest-close" @click="emit('close')" aria-label="Close">&times;</button>
+        <div ref="dialogRef" class="interest-modal-inner" role="dialog" aria-modal="true" aria-labelledby="interest-title" tabindex="-1">
+          <button type="button" class="interest-close" @click="emit('close')" :aria-label="locale === 'en' ? 'Close' : '关闭'">&times;</button>
 
           <!-- Carousel -->
           <div v-if="hasCarousel" class="carousel" @touchstart="onTouchStart" @touchend="onTouchEnd">
@@ -216,23 +227,24 @@ onUnmounted(() => {
               {{ $t('home.interestSlowHint') }}
             </div>
             <button v-if="multiImage" type="button" class="carousel-btn carousel-prev"
-              @click="gotoImage((carouselIdx - 1 + images.length) % images.length)" aria-label="Previous">&lsaquo;</button>
+              @click="gotoImage((carouselIdx - 1 + images.length) % images.length)" :aria-label="locale === 'en' ? 'Previous image' : '上一张图片'">&lsaquo;</button>
             <button v-if="multiImage" type="button" class="carousel-btn carousel-next"
-              @click="gotoImage((carouselIdx + 1) % images.length)" aria-label="Next">&rsaquo;</button>
+              @click="gotoImage((carouselIdx + 1) % images.length)" :aria-label="locale === 'en' ? 'Next image' : '下一张图片'">&rsaquo;</button>
             <div v-if="multiImage" class="carousel-dots">
-              <span v-for="(_, idx) in images" :key="idx" class="carousel-dot"
-                :class="{ active: idx === carouselIdx }" @click="gotoImage(idx)"></span>
+              <button v-for="(_, idx) in images" :key="idx" type="button" class="carousel-dot"
+                :class="{ active: idx === carouselIdx }" :aria-label="locale === 'en' ? `Show image ${idx + 1}` : `查看第 ${idx + 1} 张图片`" :aria-pressed="idx === carouselIdx" @click="gotoImage(idx)"></button>
             </div>
+            <button v-if="multiImage" type="button" class="carousel-play" @click="carouselPlaying ? stopCarousel() : startCarousel()">{{ locale === 'en' ? (carouselPlaying ? 'Pause slideshow' : 'Play slideshow') : (carouselPlaying ? '暂停轮播' : '自动轮播') }}</button>
           </div>
 
-          <h3 class="interest-modal-title">{{ label(interest) }}</h3>
+          <h2 id="interest-title" class="interest-modal-title">{{ label(interest) }}</h2>
 
           <div class="interest-modal-body" v-html="descPages[currentPage] || ''"></div>
 
           <div v-if="hasPages" class="pagination-bar">
-            <button type="button" class="page-btn" :disabled="currentPage === 0" @click="goPage(-1)">&laquo;</button>
+            <button type="button" class="page-btn" :disabled="currentPage === 0" :aria-label="locale === 'en' ? 'Previous page' : '上一页'" @click="goPage(-1)">&laquo;</button>
             <span class="page-label">{{ pageLabel }}</span>
-            <button type="button" class="page-btn" :disabled="currentPage >= descPages.length - 1" @click="goPage(1)">&raquo;</button>
+            <button type="button" class="page-btn" :disabled="currentPage >= descPages.length - 1" :aria-label="locale === 'en' ? 'Next page' : '下一页'" @click="goPage(1)">&raquo;</button>
           </div>
         </div>
       </div>
@@ -256,15 +268,16 @@ onUnmounted(() => {
   backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  padding: 32px 28px 28px;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
+  padding: 64px 28px 28px;
+  box-shadow: var(--shadow-md);
+  outline: none;
 }
 
 .interest-close {
   position: absolute; top: 12px; right: 16px; z-index: 10;
   appearance: none; border: none; background: none;
   font-size: 24px; color: var(--text-muted); cursor: pointer;
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
   transition: all var(--duration-fast) var(--ease-out);
@@ -301,7 +314,7 @@ onUnmounted(() => {
   appearance: none; border: none;
   background: rgba(0,0,0,0.35); backdrop-filter: blur(8px);
   color: #fff; font-size: 22px;
-  width: 34px; height: 34px; border-radius: 50%;
+  width: 44px; height: 44px; border-radius: 50%;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: all var(--duration-fast) var(--ease-out);
@@ -310,17 +323,14 @@ onUnmounted(() => {
 .carousel-prev { left: 8px; }
 .carousel-next { right: 8px; }
 
-.carousel-dots {
-  display: flex; justify-content: center; gap: 8px;
-  padding: 10px 0 0;
-}
+.carousel-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; padding: 4px 8px 0; }
 .carousel-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: rgba(128,128,128,0.3); cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-out);
+  width: 44px; height: 44px; padding: 18px; border: none;
+  background: transparent; cursor: pointer;
 }
-.carousel-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
-.carousel-dot:hover { background: rgba(128,128,128,0.55); }
+.carousel-dot::before { display: block; content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+.carousel-dot.active::before, .carousel-dot:hover::before { background: var(--accent); }
+.carousel-play { display: block; min-height: 44px; margin: 0 auto; padding: 4px 16px; background: transparent; border: 0; color: var(--accent); font-size: 12px; }
 
 .carousel-slow-hint {
   position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
@@ -334,12 +344,12 @@ onUnmounted(() => {
 }
 
 .interest-modal-title {
-  font-family: var(--font-pixel); font-size: 14px;
-  color: var(--accent); margin: 0 0 16px; text-align: center;
+  font-family: var(--font-display); font-size: 25px; font-weight: 500;
+  color: var(--text); margin: 0 0 20px; text-align: left;
 }
 
 .interest-modal-body {
-  font-size: 14px; line-height: 1.85; color: var(--text-muted);
+  font-size: 15px; line-height: 1.85; color: var(--text-muted);
   text-align: left; margin: 0;
 }
 
@@ -370,7 +380,7 @@ onUnmounted(() => {
 .page-btn {
   appearance: none; border: 1px solid var(--border);
   background: var(--bg-card); color: var(--text);
-  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  width: 44px; height: 44px; border-radius: var(--radius-sm);
   cursor: pointer; font-size: 16px;
   display: flex; align-items: center; justify-content: center;
   transition: all var(--duration-fast) var(--ease-out);
@@ -384,6 +394,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .interest-modal-inner { padding: 24px 18px 20px; }
+  .interest-modal-inner { padding: 64px 20px 24px; }
 }
 </style>

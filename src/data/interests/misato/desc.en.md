@@ -1,8 +1,8 @@
 # Misato Katsuragi
 
-NERV Operations Director, Shinji's guardian, and the only adult in EVA who genuinely tries to understand him.
+NERV's operations director, Shinji's guardian, and the only adult in EVA who truly tries to understand him.
 
-On the surface: the cheerful big-sister type — drinks beer like water, lives in a trash heap, oversleeps every day.
+On the surface, she's the cheerful, easygoing big-sister type — she drinks beer like water, her room is a total mess, and she oversleeps every day.
 
 Beneath that shell: the little girl who watched her father die during Second Impact.
 

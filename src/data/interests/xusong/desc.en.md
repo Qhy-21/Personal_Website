@@ -1,3 +1,3 @@
 # Xu Song
 
-Putting the musician identity aside — he's also quite handsome (smirk).
+Even setting aside his music, he's a handsome guy too (smirk).

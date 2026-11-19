@@ -1,215 +1,106 @@
-<script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+<script setup lang="ts">
+import { onMounted, onUnmounted, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-const emit = defineEmits(['done'])
-const visible = ref(true)
-const fading = ref(false)
-
-let canvas, ctx
-let drops = []
-let depths = []
-let speeds = []
-let alphas = []
-let fontSizes = []
-let animId = null
+const emit = defineEmits<{ done: [] }>()
+const canvasRef = shallowRef<HTMLCanvasElement | null>(null)
+const splashRef = shallowRef<HTMLElement | null>(null)
+const fading = shallowRef(false)
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const COL_GAP = 22
+let context: CanvasRenderingContext2D | null = null
+let columns: { y: number; size: number; speed: number; alpha: number }[] = []
+let animationFrame = 0
+let automaticTimer: ReturnType<typeof setTimeout> | undefined
+let dismissTimer: ReturnType<typeof setTimeout> | undefined
+let previousFrameTime = 0
 
 function randomBinary() {
-  const len = Math.floor(Math.random() * 5) + 2
-  let s = ''
-  for (let i = 0; i < len; i++) s += Math.random() > 0.5 ? '0' : '1'
-  return s
+  const length = Math.floor(Math.random() * 5) + 2
+  return Array.from({ length }, () => Math.random() > .5 ? '0' : '1').join('')
 }
-
 function columnFromDepth() {
-  const depth = Math.random() * 0.88 + 0.12
+  const depth = Math.random() * .88 + .12
   return {
-    depth,
     y: Math.random() * (-window.innerHeight / COL_GAP),
-    fs: Math.round(6 + depth * 54),
-    speed: 0.05 + depth * 0.45,
-    alpha: 0.06 + depth * 0.5,
+    size: Math.round(6 + depth * 54),
+    speed: .05 + depth * .45,
+    alpha: .06 + depth * .5,
   }
 }
-
-function initDrops() {
-  const cols = Math.floor(window.innerWidth / COL_GAP)
-  drops = new Array(cols)
-  depths = new Array(cols)
-  speeds = new Array(cols)
-  alphas = new Array(cols)
-  fontSizes = new Array(cols)
-  for (let i = 0; i < cols; i++) {
-    const c = columnFromDepth()
-    drops[i] = c.y
-    depths[i] = c.depth
-    speeds[i] = c.speed
-    alphas[i] = c.alpha
-    fontSizes[i] = c.fs
-  }
+function resize() {
+  const canvas = canvasRef.value
+  if (!canvas) return
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+  columns = Array.from({ length: Math.floor(canvas.width / COL_GAP) }, columnFromDepth)
 }
-
-function draw() {
-  if (!ctx) return
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-  for (let i = 0; i < drops.length; i++) {
-    const str = randomBinary()
-    const x = i * COL_GAP
-    const y = drops[i] * COL_GAP
-    const fs = fontSizes[i]
-    const a = alphas[i]
-
-    ctx.font = `${fs}px "JetBrains Mono", "Courier New", monospace`
-    ctx.fillStyle = `rgba(212, 64, 120, ${a})`
-
-    for (let j = 0; j < str.length; j++) {
-      ctx.fillText(str[j], x, y + j * fs)
+function draw(time: number) {
+  const canvas = canvasRef.value
+  if (!canvas || !context) return
+  const elapsed = previousFrameTime ? Math.min((time - previousFrameTime) / (1000 / 60), 3) : 1
+  previousFrameTime = time
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  columns.forEach((column, index) => {
+    const binary = randomBinary()
+    const y = column.y * COL_GAP
+    context!.font = `${column.size}px "JetBrains Mono", "Courier New", monospace`
+    context!.fillStyle = `rgba(212, 64, 120, ${column.alpha})`
+    for (let j = 0; j < binary.length; j++) context!.fillText(binary[j], index * COL_GAP, y + j * column.size)
+    if (y > canvas.height && Math.random() > .975) {
+      Object.assign(column, columnFromDepth(), { y: Math.random() * -6 })
     }
-
-    if (y > canvas.height && Math.random() > 0.975) {
-      const c = columnFromDepth()
-      drops[i] = Math.random() * (-6)
-      depths[i] = c.depth
-      speeds[i] = c.speed
-      alphas[i] = c.alpha
-      fontSizes[i] = c.fs
-    }
-    drops[i] += speeds[i]
-  }
-  animId = requestAnimationFrame(draw)
+    column.y += column.speed * elapsed
+  })
+  if (!reducedMotion) animationFrame = requestAnimationFrame(draw)
 }
-
 function dismiss() {
   if (fading.value) return
+  clearTimeout(automaticTimer)
+  window.removeEventListener('keydown', dismiss)
   fading.value = true
-  setTimeout(() => {
-    visible.value = false
-    emit('done')
-  }, 800)
+  dismissTimer = setTimeout(() => emit('done'), reducedMotion ? 0 : 800)
 }
-
-function onResize() {
-  if (!canvas) return
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
-  initDrops()
-}
-
 onMounted(() => {
-  canvas = document.getElementById('matrix-canvas')
-  if (!canvas) return
-  ctx = canvas.getContext('2d')
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
-  initDrops()
-  draw()
-
-  const timer = setTimeout(dismiss, 3500)
-
-  window.addEventListener('resize', onResize)
+  context = canvasRef.value?.getContext('2d') || null
+  resize()
+  if (!reducedMotion) animationFrame = requestAnimationFrame(draw)
+  automaticTimer = setTimeout(dismiss, 3500)
+  window.addEventListener('resize', resize)
   window.addEventListener('keydown', dismiss, { once: true })
-  canvas.addEventListener('click', () => {
-    clearTimeout(timer)
-    dismiss()
-  })
-
-  onUnmounted(() => {
-    clearTimeout(timer)
-    cancelAnimationFrame(animId)
-    window.removeEventListener('resize', onResize)
-    window.removeEventListener('keydown', dismiss)
-  })
+  splashRef.value?.focus({ preventScroll: true })
+})
+onUnmounted(() => {
+  clearTimeout(automaticTimer)
+  clearTimeout(dismissTimer)
+  cancelAnimationFrame(animationFrame)
+  window.removeEventListener('resize', resize)
+  window.removeEventListener('keydown', dismiss)
 })
 </script>
 
 <template>
-  <Transition name="matrix">
-    <div v-if="visible" class="matrix-splash" :class="{ 'is-fading': fading }">
-      <canvas id="matrix-canvas"></canvas>
-      <div class="matrix-glow"></div>
-      <div class="matrix-overlay">
-        <div class="matrix-title">{{ t('site.splashTitle') }}</div>
-        <p class="matrix-hint">{{ t('site.splashHint') }}</p>
-      </div>
+  <div ref="splashRef" class="matrix-splash" :class="{ 'is-fading': fading }" role="dialog" aria-modal="true" :aria-label="t('site.splashTitle')" aria-describedby="matrix-hint" tabindex="-1" @click="dismiss">
+    <canvas id="matrix-canvas" ref="canvasRef" aria-hidden="true"></canvas>
+    <div class="matrix-glow" aria-hidden="true"></div>
+    <div class="matrix-overlay">
+      <div class="matrix-title">{{ t('site.splashTitle') }}</div>
+      <button id="matrix-hint" type="button" class="matrix-hint" @click.stop="dismiss">{{ t('site.splashHint') }}</button>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style scoped>
-.matrix-splash {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: #f6f5fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.matrix-splash.is-fading {
-  animation: matrixFadeOut 0.6s ease forwards;
-  pointer-events: none;
-}
-
-@keyframes matrixFadeOut {
-  to { opacity: 0; }
-}
-
-#matrix-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.matrix-glow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, rgba(212, 64, 120, 0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.matrix-overlay {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  pointer-events: none;
-}
-
-.matrix-title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: clamp(14px, 3vw, 22px);
-  color: #c02060;
-  text-shadow:
-    0 0 10px rgba(192, 32, 96, 0.4),
-    0 0 30px rgba(192, 32, 96, 0.2);
-  letter-spacing: 0.12em;
-  animation: titleGlow 2s ease-in-out infinite;
-  margin-bottom: 24px;
-}
-
-@keyframes titleGlow {
-  0%, 100% { text-shadow: 0 0 10px rgba(192, 32, 96, 0.3), 0 0 30px rgba(192, 32, 96, 0.15); }
-  50% { text-shadow: 0 0 16px rgba(192, 32, 96, 0.6), 0 0 50px rgba(212, 64, 120, 0.3), 0 0 80px rgba(212, 64, 120, 0.12); }
-}
-
-.matrix-hint {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  color: rgba(192, 32, 96, 0.5);
-  letter-spacing: 0.08em;
-  animation: hintBlink 2.5s ease-in-out infinite;
-}
-
-@keyframes hintBlink {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
-
-.matrix-enter-active { transition: opacity 0.15s ease; }
-.matrix-leave-active { transition: opacity 0.5s ease; }
-.matrix-enter-from, .matrix-leave-to { opacity: 0; }
+.matrix-splash { position: fixed; inset: 0; z-index: 9999; background: #f6f5fa; display: flex; align-items: center; justify-content: center; outline: none; cursor: pointer; }
+.matrix-splash.is-fading { animation: matrixFadeOut .6s ease forwards; pointer-events: none; }
+@keyframes matrixFadeOut { to { opacity: 0; } }
+#matrix-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.matrix-glow { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(212, 64, 120, .06) 0%, transparent 70%); pointer-events: none; }
+.matrix-overlay { position: relative; z-index: 1; text-align: center; padding: 24px; max-width: 100%; }
+.matrix-title { font-family: 'Press Start 2P', monospace; font-size: clamp(14px, 3vw, 22px); color: #c02060; text-shadow: 0 0 10px rgba(192, 32, 96, .4), 0 0 30px rgba(192, 32, 96, .2); letter-spacing: .12em; animation: titleGlow 2s ease-in-out infinite; margin-bottom: 24px; overflow-wrap: anywhere; }
+@keyframes titleGlow { 0%, 100% { text-shadow: 0 0 10px rgba(192, 32, 96, .3), 0 0 30px rgba(192, 32, 96, .15); } 50% { text-shadow: 0 0 16px rgba(192, 32, 96, .6), 0 0 50px rgba(212, 64, 120, .3), 0 0 80px rgba(212, 64, 120, .12); } }
+.matrix-hint { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; color: rgba(192, 32, 96, .7); letter-spacing: .08em; animation: hintBlink 2.5s ease-in-out infinite; background: transparent; border: 0; min-height: 44px; padding: 8px 12px; }
+@keyframes hintBlink { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .matrix-title, .matrix-hint, .matrix-splash.is-fading { animation: none; } }
 </style>

@@ -23,6 +23,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    if (to.hash) return { el: to.hash }
+    // Reading pages manage their own article and essay positions.
+    if (to.path.startsWith('/journal/')) return false
+    return { top: 0, behavior: 'instant' }
+  },
 })
 
 export default router

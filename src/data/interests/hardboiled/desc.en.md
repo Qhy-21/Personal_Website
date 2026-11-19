@@ -16,12 +16,12 @@ This book is the culmination of every Murakami motif: the boundary between reali
 
 > "I feel that even if I could start my life over, I would probably walk the same path again. Because that is who I am. I have no choice but to be myself. Even if more people abandon me, or I abandon more people, even if colorful emotions, outstanding qualities, and hopes for the future are limited or vanish, I can only be myself. Is there any other possibility?"
 
-> "They know nothing. They have no idea that I carry a flashlight and a large pocketknife, with a wounded stomach, descending into a pitch-black hole. All they have in their heads are speedometer readings, premonitions of sex, and bland pop songs that have fallen off the charts. Of course I can't blame them — they simply don't know."
+> "They know nothing. They have no idea that, with a flashlight and a large pocketknife and a wound in my belly, I am descending to the bottom of a pitch-black hole. All they have in their heads are speedometer readings, the anticipation of sex, and bland pop songs plummeting down the charts. Of course I can't blame them — they simply don't know."
 
 > "Without conflict, resentment, and desire, there would be no joy, happiness, or love. Precisely because there is despair, disillusionment, and sorrow, there can be joy. Ultimate happiness without despair does not exist. You may truly love her, but that feeling has no home, because she no longer has a heart. A person without a heart is merely a phantom — what meaning is there in possessing such a phantom?"
 
-> "I feel like bursting into sorrowful song, but I cannot. I am too old for tears now. Besides, I have experienced too many things. There exists in this world a sorrow that cannot be wept. This sorrow cannot be explained to anyone, and even if explained, no one would understand. It remains unchanged forever, quietly settling at the bottom of the heart like snowflakes on a windless night."
+> "I feel like bursting into sorrowful song, but I cannot. I am too old for tears now. Besides, I have experienced too many things. There is a sorrow in this world for which no tears can be shed. This sorrow cannot be explained to anyone, and even if I tried, no one would understand. It remains unchanged forever, quietly settling at the bottom of the heart like snowflakes on a windless night."
 
-> "As for how I abandoned the original world and had no choice but to come to this end of the world, I cannot recall no matter what — I cannot remember the process, the meaning, or the purpose. It was something, some force — some absurdly powerful force — that sent me here! And thus I lost my shadow and my memories, and am about to lose my heart."
+> "As for why I left my original world and had no choice but to come to this end of the world, I cannot remember, however hard I try — neither how it happened, nor its meaning or purpose. It was something, some force — some absurdly powerful force — that sent me here! And so I lost my shadow and my memories, and am now losing my heart."
 
 > I long to live in that town.

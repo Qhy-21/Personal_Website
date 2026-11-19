@@ -1,6 +1,6 @@
 const projects = [
   { label: 'WRITING · 00', labelEn: 'WRITING · 00',
-    title: '墨笺 - 个人书写平台', titleEn: 'InkSlab — Personal Writing Platform',
+    title: '墨笺 - 个人书写平台', titleEn: 'Mojian (墨笺) — Personal Writing Platform',
     description: '基于 Node.js + Koa 2 + Vue 3 构建的全栈个人写作应用。支持 Markdown 编辑预览、文章分类管理、标签系统、主题切换（浅色/深色/护眼）、图片上传、全文搜索。数据使用本地 JSON 文件存储，PDF/Word 导出使用 Puppeteer。采用迭代开发模式（MVP → 功能增强）。',
     descriptionEn: 'A full-stack personal writing app built with Node.js + Koa 2 + Vue 3. Markdown editing, category/tag management, theme switching (light/dark/eye-care), image upload, full-text search. Local JSON storage, PDF/Word export via Puppeteer. Iterative development (MVP → feature enhancement).',
     tech_tags: 'Node.js,Koa 2,Vue 3,Vite,marked,Puppeteer', status: 'completed', status_label: '独立开发', status_labelEn: 'Solo Dev', year: '2026',
@@ -21,7 +21,7 @@ const projects = [
     title: '个人网站 v2.0 — Vue 3 + Vite 重构', titleEn: 'Personal Site v2.0 — Vue 3 + Vite Rebuild',
     description: '将原纯 HTML/CSS/JS 个人网站重构为 Vue 3 + Vite 组件化 SPA。Vue Router 管理 6 个页面，数据模块化分离（技能/项目/日记/兴趣/ML知识），Scoped CSS + 全局样式双层级组织，像素风启动动画，Vercel 自动部署。代码可维护性大幅提升。',
     descriptionEn: 'Rebuilt original HTML/CSS/JS site as a Vue 3 + Vite component-based SPA. 6 pages via Vue Router, modular data (skills/projects/journal/interests/ML), scoped + global CSS, pixel-art splash animation, Vercel deployment.',
-    tech_tags: 'Vue 3,Vite,Vue Router,组件化,SPA,Vercel', status: 'completed', status_label: '重构', status_labelEn: 'Rebuild', year: '2026',
+    tech_tags: 'Vue 3,Vite,Vue Router,组件化,SPA,Vercel', tech_tagsEn: 'Vue 3,Vite,Vue Router,Components,SPA,Vercel', status: 'completed', status_label: '重构', status_labelEn: 'Rebuild', year: '2026',
     links: [{ type: 'github', url: 'https://github.com/Qhy-21' }] },
   { label: 'CHAT · 04', labelEn: 'CHAT · 04',
     title: 'EasyChat 仿微信聊天', titleEn: 'EasyChat — WeChat-style Messenger',
@@ -33,7 +33,7 @@ const projects = [
     title: 'B站教学视频', titleEn: 'Bilibili Tutorial Videos',
     description: '录制了 Android + DeepSeek 入门教程，发布在 B站，帮助同学复习的同时锻炼表达能力。',
     descriptionEn: 'Created Android + DeepSeek introductory tutorials on Bilibili to help classmates review while building presentation skills.',
-    tech_tags: 'Android,DeepSeek,内容创作', status: 'completed', status_label: '已完成', status_labelEn: 'Done', year: '',
+    tech_tags: 'Android,DeepSeek,内容创作', tech_tagsEn: 'Android,DeepSeek,Content Creation', status: 'completed', status_label: '已完成', status_labelEn: 'Done', year: '',
     links: [{ type: 'bilibili', url: 'https://www.bilibili.com/video/BV1MV2DBzEyf' }] },
 ]
 

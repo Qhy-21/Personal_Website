@@ -1,6 +1,7 @@
 {
   "site": {
     "title": "羌花吟の个人网站",
+    "description": "羌花吟の个人网站 · 一个计算机人的像素小宇宙",
     "tagline": "在比特流之间生存",
     "loading": "加载中...",
     "loadingSub": "在比特流之间生存",
@@ -34,8 +35,8 @@
   "about": {
     "title": "关于 · ABOUT",
     "name": "Alfie",
-    "role": "AI应用开发 | Java全栈开发 | agent",
-    "desc": "\n全栈开发",
+    "role": "AI应用开发 · Java全栈开发 · agent",
+    "desc": "全栈开发",
     "basicInfo": "基本信息",
     "website": "个人网址",
     "email": "邮箱",
@@ -45,7 +46,7 @@
     "school": "学校",
     "locationValue": "安徽·合肥",
     "ageValue": "22岁",
-    "schoolValue": "合肥**** · 软件工程",
+    "schoolValue": "合肥**** · 软件工程 · 大四",
     "timeline": "时间轴 · TIMELINE",
     "tl2023Title": "2023 · 初识代码",
     "tl2023Text": "在一块旧键盘上敲下第一行「Hello, World!」的那一刻，世界开始变得不一样。",
@@ -53,15 +54,31 @@
     "tl2024Text": "开始系统学习 Java，接触 JavaWeb、数据库与前后端交互。",
     "tl2025Title": "2025 · 项目实践",
     "tl2025Text": "完成 Android 应用与网上橱窗商城项目，开始积累实战经验。",
-    "tl2026Title": "2026 上半年 · 全栈探索",
+    "tl2026Title": "2026年上旬 · 全栈探索",
     "tl2026Text": "个人网站、学习计时器、墨笺书写平台、EasyChat 仿微信聊天等项目逐步完成。",
-    "tlNowTitle": "现在 · Maxwell公司实习中",
+    "tl2026MidTitle": "2026年中旬 · Maxwell公司",
+    "tl2026MidText": "PMS系统开发及维护",
+    "tl2026LateTitle": "2026年下旬 · 超速思考公司",
     "slogan": "全栈 × AI · 在学习的路上永不停歇"
   },
   "skills": {
-    "title": "技能树 · SKILL TREE",
-    "mlTitle": "机器学习知识体系 · ML KNOWLEDGE TREE",
-    "mlFooter": "🎯 持续更新中 · 为 AI 构建知识体系"
+    "title": "知识星系 · KNOWLEDGE ORBIT",
+    "eyebrow": "个人技术坐标",
+    "intro": "每个领域都是一颗持续生长的星球。点击轨道上的星球，查看它正在聚拢的知识。",
+    "orbitHint": "选择一颗领域星球",
+    "coreLabel": "知识核心",
+    "coreName": "QHY",
+    "activeDomain": "当前星球",
+    "nodes": "{n} 个知识节点",
+    "status": "持续演化",
+    "levels": {
+      "core": "核心轨道",
+      "familiar": "稳定轨道",
+      "exploring": "探索轨道"
+    },
+    "mlTitle": "深空档案 · ML KNOWLEDGE",
+    "mlIntro": "机器学习的详细笔记被收纳在这里，每次展开一个主题。",
+    "mlFooter": "知识边界仍在向外扩展"
   },
   "projects": {
     "title": "项目 · PROJECTS",
@@ -94,7 +111,7 @@
     "location": "位置",
     "school": "学校",
     "locationValue": "安徽·合肥",
-    "schoolValue": "合肥**** · 软件工程",
+    "schoolValue": "合肥**** · 软件工程 · 大四",
     "messageToFuture": "给未来的自己",
     "msg1": "也许某天，当你回来，会发现很多地方早已面目全非。",
     "msg2": "但没关系，迭代本就是生活常态。"
@@ -109,10 +126,10 @@
     "skipped": "暂存 {n} 组",
     "undo": "上一步",
     "skip": "暂存",
-    "randomSkip": "随机暂存",
+    "randomSkip": "随机取回",
     "skipTitle": "将当前对决暂存，稍后处理",
     "randomSkipTitle": "从暂存队列中随机抽一组回来继续投票",
-    "hint": "选不出来？点「暂存」跳过，稍后从「随机暂存」中继续",
+    "hint": "选不出来？点「暂存」跳过，稍后点「随机取回」继续投票",
     "champion": "★ 冠军歌曲 ★",
     "champions": "★ 共同晋级 ★",
     "pass": "共同晋级",
@@ -135,7 +152,7 @@
     "confirmClearDesc": "确定要清空所有投票记录吗？此操作不可撤销。",
     "confirmYes": "确认",
     "confirmCancel": "取消",
-    "liveBracket": "▼ 晋级进度（已完成 {n} 轮）",
+    "liveBracket": "晋级进度（已完成 {n} 轮）",
     "showAllRounds": "展开全部 {n} 轮晋级图",
     "collapseAll": "收起全部"
   },

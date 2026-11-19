@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { useDialog } from '../composables/useDialog'
 
 const props = defineProps({
   total: { type: Number, default: null },
@@ -8,18 +9,24 @@ const props = defineProps({
   locale: { type: String, required: true },
 })
 const emit = defineEmits(['close'])
+const modalOpen = computed({ get: () => props.total !== null, set: value => { if (!value) emit('close') } })
+const { dialogRef } = useDialog(modalOpen)
+
+function locationLabel(value) {
+  return !value || value === '未知' ? (props.locale === 'en' ? 'Unknown' : '未知') : value
+}
 </script>
 
 <template>
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="total !== null" class="visitor-modal" @click.self="emit('close')">
-        <div class="visitor-modal-inner">
-          <button type="button" class="visitor-close" @click="emit('close')" aria-label="Close">&times;</button>
-          <h3 class="visitor-modal-title">
+        <div ref="dialogRef" class="visitor-modal-inner" role="dialog" aria-modal="true" aria-labelledby="visitor-title" tabindex="-1">
+          <button type="button" class="visitor-close" @click="emit('close')" :aria-label="locale === 'en' ? 'Close visitor statistics' : '关闭访客统计'">&times;</button>
+          <h2 id="visitor-title" class="visitor-modal-title">
             <span class="vc-dot">&#9672;</span>
             {{ locale === 'en' ? 'Visitor Statistics' : '访客统计' }}
-          </h3>
+          </h2>
           <p class="visitor-total-line">
             {{ locale === 'en' ? 'Total visits' : '累计访客' }}
             <strong>{{ total?.toLocaleString() }}</strong>
@@ -27,7 +34,7 @@ const emit = defineEmits(['close'])
 
           <div v-if="countries.length" class="visitor-bars">
             <div v-for="(c, i) in countries.slice(0, 8)" :key="c.name" class="visitor-bar-row">
-              <span class="vb-label">{{ c.name }}</span>
+              <span class="vb-label">{{ locationLabel(c.name) }}</span>
               <span class="vb-track">
                 <span class="vb-fill" :style="{ width: Math.max(4, (c.count / countries[0].count) * 100) + '%' }"></span>
               </span>
@@ -38,7 +45,7 @@ const emit = defineEmits(['close'])
           <div v-if="recent.length" class="visitor-recent">
             <h4 class="vr-title">{{ locale === 'en' ? 'Recent Visitors' : '最近访客' }}</h4>
             <div v-for="(r, i) in recent" :key="i" class="vr-row">
-              <span class="vr-loc">{{ r.country }}{{ r.city !== '未知' ? ' · ' + r.city : '' }}</span>
+              <span class="vr-loc">{{ locationLabel(r.country) }}{{ r.city && r.city !== '未知' ? ' · ' + r.city : '' }}</span>
               <span class="vr-time">{{ new Date(r.time).toLocaleString(locale === 'zh-CN' ? 'zh-CN' : 'en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) }}</span>
             </div>
           </div>
@@ -67,14 +74,15 @@ const emit = defineEmits(['close'])
   backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  padding: 32px 28px 24px;
+  padding: 64px 28px 28px;
+  outline: none;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
 }
 .visitor-close {
   position: absolute; top: 12px; right: 16px; z-index: 10;
   appearance: none; border: none; background: none;
   font-size: 24px; color: var(--text-muted); cursor: pointer;
-  width: 36px; height: 36px;
+  width: 44px; height: 44px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
   transition: all var(--duration-fast) var(--ease-out);
@@ -82,8 +90,9 @@ const emit = defineEmits(['close'])
 .visitor-close:hover { color: var(--text); background: rgba(128,128,128,0.1); }
 
 .visitor-modal-title {
-  font-family: var(--font-pixel);
-  font-size: 11px;
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 500;
   color: var(--accent);
   margin: 0 0 4px;
   text-align: center;
@@ -92,7 +101,7 @@ const emit = defineEmits(['close'])
   justify-content: center;
   gap: 6px;
 }
-.vc-dot { font-size: 6px; animation: logoPulse 3s ease-in-out infinite; }
+.vc-dot { font-size: 6px; }
 
 .visitor-total-line {
   text-align: center;
@@ -137,6 +146,7 @@ const emit = defineEmits(['close'])
   overflow: hidden;
 }
 .vb-fill {
+  display: block;
   height: 100%;
   border-radius: 4px;
   background: linear-gradient(90deg, var(--accent), var(--accent-strong));

@@ -44,7 +44,7 @@ const mlCards = [
     ],
     topicsEn: [
       '<strong>KNN Classifier</strong> — from-scratch Python implementation: Euclidean distance, k-nearest voting',
-      '<strong>Movie Classification</strong> — classify films as drama vs action by fight/romance scene counts',
+      '<strong>Movie Classification</strong> — classify art films vs action films by counting fight scenes and visually lyrical scenes',
       '<strong>Iris Decision Tree</strong> — 3-class iris classification + tree visualization (plot_tree)',
       '<strong>Boston Housing Regression</strong> — linear regression to predict prices, analyze feature weights',
       '<strong>Logistic Regression Experiment</strong> — social network ad dataset, compare KNN/DT/NB/LR accuracy',
@@ -82,9 +82,9 @@ const mlCards = [
       '<strong>pandas</strong> — DataFrame CSV I/O, missing value handling, filtering & statistics',
       '<strong>matplotlib</strong> — scatter, bar charts, decision boundary subplot layouts',
       '<strong>scikit-learn</strong> — unified API for classification/regression/clustering, model evaluation',
-      '<strong>Jupyter Notebook</strong> — interactive experiments & Markdown reporting',
+      '<strong>Jupyter Notebook</strong> — interactive experiments and writing Markdown reports',
     ] },
-  { title: '🎯 正在学习 / 下一步', titleEn: '🎯 Learning Next', open: true, dashed: true,
+  { title: '🎯 正在学习 / 下一步', titleEn: '🎯 Currently Learning / Next Steps', open: true, dashed: true,
     topics: [
       '<strong>数学基础</strong> —— 线性代数（矩阵求导、SVD）、概率论（MLE）、信息论',
       '<strong>集成学习</strong> —— Random Forest、XGBoost 的原理与调参',
@@ -99,7 +99,7 @@ const mlCards = [
       '<strong>Advanced Feature Engineering</strong> — PCA dimensionality reduction, feature selection, categorical encoding',
       '<strong>Intro to Neural Networks</strong> — backpropagation derivation, PyTorch basics',
       '<strong>Intro to NLP</strong> — word vectors (Word2Vec), text preprocessing pipelines',
-      '<strong>Interview Prep</strong> — ML fundamentals, formula derivations, Kaggle starter',
+      '<strong>Interview Prep</strong> — common ML interview questions, formula derivations, getting started with Kaggle',
     ] },
 ]
 
