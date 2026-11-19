@@ -412,7 +412,7 @@ watch(() => route.fullPath, load)
 .reader-main :deep(.markdown-body a) { text-decoration: underline; text-underline-offset: 4px; }
 .reader-main :deep(.markdown-body pre) { max-width: 100%; }
 .essay-collection-title { font-family: var(--font-display); font-size: 40px; font-weight: 500; margin: 0 0 48px; line-height: 1.4; }
-.essay-block { scroll-margin-top: 128px; margin-bottom: 48px; padding-bottom: 40px; border-bottom: 1px solid var(--border); }
+.essay-block { scroll-margin-top: 8px; margin-bottom: 48px; padding-bottom: 40px; border-bottom: 1px solid var(--border); }
 .essay-block:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .essay-number { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-bottom: 20px; font-variant-numeric: tabular-nums; }
 .essay-number::before { content: '— '; }
@@ -456,6 +456,28 @@ watch(() => route.fullPath, load)
   .entry-pager { flex-direction: column; }
   .entry-pager-btn { max-width: none; width: 100%; }
   .entry-pager-btn--next { text-align: left; align-items: flex-start; }
+}
+@media (max-width: 640px) {
+  .journal-detail { padding-bottom: 60px; }
+  .detail-nav { gap: 0 12px; margin: 0 0 14px; padding-bottom: 10px; }
+  .reader-back { min-height: 44px; font-size: 13px; }
+  .detail-breadcrumb { gap: 6px; font-size: 11px; }
+  .reader-main { padding: 18px 14px; }
+  .reading-eyebrow { margin-bottom: 16px; gap: 8px; font-size: 9px; }
+  .reader-main :deep(.markdown-body) { font-size: 16px; line-height: 1.9; }
+  .reader-main :deep(.markdown-body h1) { font-size: 24px; padding-bottom: 16px; margin-bottom: 18px; }
+  .reader-main :deep(.markdown-body h2) { font-size: 21px; margin-top: 26px; }
+  .reader-main :deep(.markdown-body p) { margin-bottom: 18px; line-height: 1.95; }
+  .reader-main :deep(.poem-body p) { line-height: 2.1; }
+  .essay-collection-title { font-size: 24px; margin-bottom: 24px; }
+  .essay-block { margin-bottom: 28px; padding-bottom: 24px; }
+  .essay-number { margin-bottom: 12px; }
+  .entry-pager { margin-top: 28px; padding-top: 18px; gap: 12px; }
+  .entry-pager-btn { padding: 12px; min-height: 44px; }
+  .sidebar-fab { right: 12px; bottom: max(16px, env(safe-area-inset-bottom)); min-height: 44px; padding: 10px 14px; font-size: 13px; }
+  .sidebar-panel { padding-inline: 16px; }
+  .detail-loading, .detail-empty { padding: 44px 18px; }
+  .detail-empty h1 { font-size: 24px; margin-bottom: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { .sidebar-slide-enter-active, .sidebar-slide-leave-active, .sidebar-slide-enter-active .sidebar-panel, .sidebar-slide-leave-active .sidebar-panel { transition: none; } }
 </style>

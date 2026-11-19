@@ -65,6 +65,15 @@ const walineLang = computed(() => isEnglish.value ? 'en' : 'zh-CN')
   .guestbook-welcome p { font-size: 15px; }
   .waline-card { padding: 22px 18px; }
 }
+@media (max-width: 640px) {
+  .guestbook-page { padding-bottom: 16px; }
+  .guestbook-note { font-size: 13px; line-height: 1.6; }
+  .guestbook-layout { gap: 14px; }
+  .guestbook-welcome h2 { margin-bottom: 4px; font-size: 17px; line-height: 1.5; }
+  .guestbook-welcome p { font-size: 14px; line-height: 1.65; }
+  .guestbook-welcome .guestbook-tip { margin-top: 5px; font-size: 12px; line-height: 1.6; }
+  .waline-card { padding: 14px 12px; }
+}
 </style>
 
 <style>
@@ -114,11 +123,19 @@ const walineLang = computed(() => isEnglish.value ? 'en' : 'zh-CN')
 /* EmojiPicker supplies emoji; preserve the site's existing upload/preview policy. */
 .waline-card .wl-emoji,
 .waline-card .wl-action[title="预览"],
+.waline-card .wl-action[title="Preview"],
 .waline-card .wl-action[href*="guides.github.com"],
 .waline-card label[title="上传图片"],
+.waline-card label[title="Upload Image"],
+.waline-card label[for*="image"],
 .waline-card .wl-upload,
 .waline-card .wl-meta-foot { display: none; }
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .waline-card .wl-editor, .waline-card .wl-input { font-size: 16px; }
+  .waline-card .wl-action { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 6px; }
+}
+@media (max-width: 600px) {
+  .waline-card .wl-editor { min-height: 112px; }
+  .waline-card .wl-header { padding-inline: 6px; }
 }
 </style>

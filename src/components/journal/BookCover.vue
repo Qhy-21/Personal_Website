@@ -23,10 +23,16 @@ const editions = { articles: 'STORIES', essays: 'FRAGMENTS', poems: 'POETRY' }
           <p v-if="coverSubtitle" class="cover-sub">{{ coverSubtitle }}</p>
         </div>
         <div class="cover-art" :class="'cover-art--' + props.type" aria-hidden="true"><span></span><span></span><span></span></div>
+        <span class="mobile-cover-mark" aria-hidden="true">{{ props.type === 'articles' ? '文' : props.type === 'essays' ? '随' : '诗' }}</span>
         <div class="cover-footer"><span>{{ locale === 'en' ? 'QHY' : '羌花吟' }}</span><span>{{ locale === 'en' ? 'COLLECTION' : '随写集' }}</span></div>
       </div>
     </div>
     <span class="book-hint-block"><span>{{ locale === 'en' ? 'Open this collection' : '翻开这一本' }}</span><SiteIcon name="arrow-up-right" /></span>
+    <div class="mobile-book-copy">
+      <h2>{{ coverTitle }}</h2>
+      <span v-if="coverSubtitle" class="mobile-book-subtitle">{{ coverSubtitle }}</span>
+      <span class="mobile-book-action">{{ locale === 'en' ? 'Open collection' : '翻开这一本' }}<SiteIcon name="arrow-up-right" /></span>
+    </div>
   </router-link>
 </template>
 
@@ -63,11 +69,28 @@ const editions = { articles: 'STORIES', essays: 'FRAGMENTS', poems: 'POETRY' }
 .book-hint-block { display: flex; align-items: center; justify-content: space-between; color: var(--text-muted); font-size: 13px; transition: color 180ms ease; }
 .book-hint-block :deep(svg) { width: 18px; height: 18px; }
 .book-wrap:hover .book-hint-block { color: var(--accent); }
+.mobile-book-copy, .mobile-cover-mark { display: none; }
 .cover-title, .cover-sub, .cover-edition, .cover-footer { overflow-wrap: anywhere; }
 [data-theme="dark"] .book-wrap { --cover-bg: #293449; --cover-ink: #e0e7f3; --spine-color: #4e607b; --cover-detail: #7384a2; }
 [data-theme="dark"] .book-wrap--essays { --cover-bg: #392e46; --cover-ink: #ebe1f2; --spine-color: #6f5c83; --cover-detail: #9983ad; }
 [data-theme="dark"] .book-wrap--poems { --cover-bg: #492f39; --cover-ink: #f4e0e5; --spine-color: #895767; --cover-detail: #ba8396; }
 @media (max-width: 900px) and (min-width: 701px) { .book-cover-face { padding: 20px 14px; } .cover-title { font-size: 27px; } .cover-sub { font-size: 11px; } .cover-art { transform: scale(.75); transform-origin: center right; margin-block: 8px; } .cover-title-block { margin-top: 24px; } }
 @media (max-width: 700px) { .book-wrap { max-width: 260px; } .book-cover-face { padding: 28px 24px 24px; } .cover-title { font-size: 36px; } .cover-title-block { margin-top: 40px; } }
+@media (max-width: 640px) {
+  .book-wrap { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center; gap: 18px; max-width: none; padding: 12px 0; }
+  .book-3d { align-self: start; transform: none; filter: drop-shadow(4px 5px 4px rgb(38 28 57 / .12)); }
+  .book-wrap:hover .book-3d, .book-wrap:focus-visible .book-3d { transform: none; }
+  .book-spine { width: 8px; padding: 0; }
+  .book-spine > span, .cover-title-block, .cover-art, .cover-footer, .book-hint-block { display: none; }
+  .book-pages { inset: 2px 0 2px 7px; }
+  .book-cover-face { margin: 0 3px 0 7px; padding: 12px 6px; justify-content: space-between; align-items: center; }
+  .cover-edition { font-size: 6px; letter-spacing: .04em; }
+  .mobile-cover-mark { display: block; margin: auto 0; font: 500 25px/1.5 var(--font-display); }
+  .mobile-book-copy { display: flex; flex-direction: column; min-width: 0; align-items: flex-start; }
+  .mobile-book-copy h2 { margin: 0 0 5px; font: 500 21px/1.5 var(--font-display); color: var(--text); overflow-wrap: anywhere; }
+  .mobile-book-subtitle { color: var(--text-muted); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+  .mobile-book-action { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--accent); font-size: 12px; }
+  .mobile-book-action :deep(svg) { width: 15px; height: 15px; }
+}
 @media (prefers-reduced-motion: reduce) { .book-3d, .book-wrap:hover .book-3d, .book-wrap:focus-visible .book-3d { transform: none; transition: none; } }
 </style>

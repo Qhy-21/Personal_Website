@@ -321,26 +321,49 @@ function confirmDesc(type: string) {
   .vote-cards { gap: 12px; }
   .vote-cards :deep(.song-card) { padding: 23px; }
 }
-@media (max-width: 600px) {
-  .idle-card { grid-template-columns: 1fr; gap: 14px; padding: 22px 24px 32px; }
-  .record-collection { min-height: 236px; }
-  .record-sleeve { top: 24px; }
+@media (max-width: 640px) {
+  .xusong-page { padding-bottom: 20px; }
+  .collection-meta { font-size: 11px; gap: 7px; }
+  .idle-card { grid-template-columns: 1fr; gap: 10px; padding: 16px 18px 20px; }
+  .record-collection { min-height: 112px; }
+  .record-sleeve { top: 6px; left: calc(50% - 42px); width: 84px; height: 84px; padding: 3px; }
+  .sleeve-0 { transform: translateX(-33px) rotate(-13deg); }
+  .sleeve-1 { transform: translateY(5px) rotate(-2deg); }
+  .sleeve-2 { transform: translateX(34px) rotate(12deg); }
   .collection-caption { bottom: 0; }
   .idle-copy { text-align: center; }
-  .idle-text { font-size: 24px; }
-  .idle-invitation { font-size: 15px; }
-  .vote-cards { grid-template-columns: 1fr; gap: 14px; }
-  .vote-cards :deep(.song-card) { min-height: 126px; padding: 24px; }
-  .vs-badge { width: 100%; }
-  .vs-text { font-size: 16px; }
-  .action-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .idle-kicker { font-size: 10px; }
+  .idle-text { margin: 7px 0 8px; font-size: 21px; line-height: 1.5; }
+  .idle-invitation { margin-bottom: 14px; font-size: 14px; line-height: 1.7; }
+  .start-btn { min-height: 44px; }
+  .vote-area { margin-bottom: 18px; }
+  .vote-cards { position: relative; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .vote-cards :deep(.song-card) { min-width: 0; min-height: 124px; padding: 16px 13px; }
+  .vote-cards :deep(.song-title) { font-size: 18px; line-height: 1.5; overflow-wrap: anywhere; }
+  .vote-cards :deep(.song-meta) { margin-top: 5px; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+  .vs-badge { position: absolute; top: 50%; left: 50%; z-index: 1; width: 27px; height: 27px; border: 1px solid var(--border); border-radius: 50%; background: var(--bg-base); transform: translate(-50%, -50%); pointer-events: none; }
+  .vs-text { font-size: 12px; }
+  .action-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
   .complete-actions { display: flex; }
-  .bot-btn { padding-inline: 15px; }
-  .stats-row { justify-content: center; gap: 6px 18px; }
-  .stat-item { font-size: 12px; }
-  .progress-track { margin-bottom: 26px; }
-  .resume-card { padding: 30px 24px; }
-  .resume-title { font-size: 23px; }
-  .xusong-confirm-card { padding: 28px 24px; }
+  .bot-btn { min-height: 44px; padding: 8px 12px; font-size: 13px; }
+  .stats-row { justify-content: space-between; gap: 5px 12px; margin-bottom: 10px; }
+  .stat-item { font-size: 11px; }
+  .progress-track { margin-bottom: 18px; }
+  .skip-desc, .hint-text { font-size: 12px; line-height: 1.65; }
+  .live-bracket-section { margin-top: 22px; padding-top: 16px; }
+  .live-bracket-toggle { min-height: 44px; padding: 8px 12px; font-size: 13px; }
+  .live-bracket-body { margin-top: 16px; }
+  .resume-card { margin-top: 0; padding: 22px 18px; }
+  .resume-icon { width: 44px; height: 44px; margin-bottom: 12px; }
+  .resume-title { margin-bottom: 8px; font-size: 21px; line-height: 1.5; }
+  .resume-desc { margin-bottom: 16px; font-size: 14px; line-height: 1.7; }
+  .resume-actions { gap: 8px; }
+  .champion-card { margin-bottom: 22px; }
+  .champion-label { margin-bottom: 16px; font-size: 21px; }
+  .champion-list { gap: 12px; }
+  .champion-list :deep(.song-card) { padding: 18px; }
+  .bracket-heading { margin: 24px 0 16px; padding-top: 18px; font-size: 21px; }
+  .xusong-confirm-card { padding: 24px 20px; }
+  .xusong-confirm-title { font-size: 21px; }
 }
 </style>

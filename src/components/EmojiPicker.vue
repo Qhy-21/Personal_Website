@@ -46,6 +46,7 @@ watch(locale, updateLabels)
 
 function build() {
   toggleBtn = document.createElement('button')
+  toggleBtn.type = 'button'
   toggleBtn.className = 'emoji-toggle'
   toggleBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>'
   toggleBtn.addEventListener('click', (e) => {
@@ -60,6 +61,7 @@ function build() {
   panel.style.cssText = 'display:none;flex-wrap:wrap;gap:4px;padding:0 0 12px'
   for (const e of emojis) {
     const btn = document.createElement('button')
+    btn.type = 'button'
     btn.className = 'emoji-btn'
     btn.textContent = e
     btn.title = e
@@ -140,5 +142,16 @@ onUnmounted(() => {
 
 .waline-card .emoji-btn:active {
   transform: scale(0.95);
+}
+@media (max-width: 900px) {
+  .waline-card .emoji-toggle,
+  .waline-card .emoji-btn {
+    box-sizing: border-box;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    flex: 0 0 44px;
+  }
 }
 </style>

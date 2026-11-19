@@ -48,4 +48,13 @@ const { t, locale } = useI18n()
   .shelf-heading > span:last-child { font-size: 12px; text-align: right; }
   .shelf-colophon { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
+@media (max-width: 640px) {
+  .journal-signature { font-size: 13px; }
+  .shelf-heading { gap: 12px; padding: 12px 0; font-size: 12px; }
+  .shelf-heading > span:last-child { font-size: 11px; }
+  .bookshelf { gap: 4px; padding: 4px 16px; }
+  .bookshelf :deep(.book-wrap + .book-wrap) { border-top: 1px solid var(--border); }
+  .shelf-colophon { padding-top: 14px; gap: 6px; font-size: 12px; }
+  .shelf-colophon > span:first-child { font-size: 9px; }
+}
 </style>

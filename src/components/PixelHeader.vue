@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { watch, inject, shallowRef, type Ref } from 'vue'
+import { watch, inject, shallowRef, onMounted, onUnmounted, type Ref } from 'vue'
 import SiteIcon from './SiteIcon.vue'
 const route = useRoute()
 const { t, locale } = useI18n()
 const theme = inject<Ref<string>>('theme')
 const toggleTheme = inject<() => void>('toggleTheme')
-const mobileOpen = shallowRef(false)
-const menuButton = shallowRef<HTMLButtonElement | null>(null)
+const headerRef = shallowRef<HTMLElement | null>(null)
+let headerObserver: ResizeObserver | null = null
 const navItems = [
   { path: '/', key: 'home' }, { path: '/skills', key: 'skills' },
   { path: '/projects', key: 'projects' }, { path: '/journal', key: 'journal' },
@@ -17,24 +17,43 @@ const navItems = [
 ]
 function active(path: string) { return path === '/' ? route.path === '/' : route.path === path || route.path.startsWith(path + '/') }
 function toggleLang() { locale.value = locale.value === 'zh-CN' ? 'en' : 'zh-CN' }
-function closeMenu() { mobileOpen.value = false; menuButton.value?.focus() }
 watch(locale, value => localStorage.setItem('lang', value))
-watch(() => route.path, () => { mobileOpen.value = false })
+function compactLabel(key: string) {
+  if (locale.value === 'en' && key === 'guestbook') return 'Guest\u200bbook'
+  if (locale.value === 'en' && key === 'xusongBot') return 'Xu Song'
+  return t('nav.' + key)
+}
+function updateHeaderOffset() {
+  if (!headerRef.value) return
+  const { height } = headerRef.value.getBoundingClientRect()
+  const top = parseFloat(getComputedStyle(headerRef.value).top) || 0
+  document.documentElement.style.setProperty('--header-offset', `${Math.ceil(height + top + 12)}px`)
+}
+onMounted(() => {
+  headerObserver = new ResizeObserver(updateHeaderOffset)
+  if (headerRef.value) headerObserver.observe(headerRef.value)
+  window.addEventListener('resize', updateHeaderOffset)
+  updateHeaderOffset()
+})
+onUnmounted(() => {
+  headerObserver?.disconnect()
+  window.removeEventListener('resize', updateHeaderOffset)
+  document.documentElement.style.removeProperty('--header-offset')
+})
 </script>
 <template>
-  <header class="site-header" @keydown.esc="closeMenu">
+  <header ref="headerRef" class="site-header">
     <div class="header-inner">
       <router-link to="/" class="site-logo" :aria-label="t('site.title')">
         <svg class="logo-mark" width="27" height="30" viewBox="0 0 27 30" aria-hidden="true"><path d="M9 0h9v7h9v9h-9v7H9v-7H0V7h9Z" fill="currentColor"/><path d="M18 23h6v7h-6Z" fill="currentColor" opacity=".35"/></svg>
         <span class="logo-copy"><span class="logo-text">{{ locale === 'en' ? 'QHY' : '羌花吟' }}<span class="logo-dot">.</span></span><span class="logo-caption">A LITTLE PIXEL WORLD</span></span>
       </router-link>
-      <nav id="site-navigation" class="site-nav" :class="{ 'is-open': mobileOpen }" :aria-label="locale === 'en' ? 'Main navigation' : '主导航'">
-        <router-link v-for="item in navItems" :key="item.path" :to="item.path" :class="{ 'is-active': active(item.path) }" :aria-current="active(item.path) ? 'page' : undefined">{{ t('nav.' + item.key) }}</router-link>
+      <nav id="site-navigation" class="site-nav" :aria-label="locale === 'en' ? 'Main navigation' : '主导航'">
+        <router-link v-for="item in navItems" :key="item.path" :to="item.path" :class="{ 'is-active': active(item.path) }" :aria-current="active(item.path) ? 'page' : undefined" :aria-label="t('nav.' + item.key)"><span class="nav-label-full">{{ t('nav.' + item.key) }}</span><span class="nav-label-compact">{{ compactLabel(item.key) }}</span></router-link>
       </nav>
       <div class="header-actions">
         <button type="button" class="theme-toggle icon-button" @click="toggleTheme?.()" :aria-label="locale === 'en' ? (theme === 'dark' ? 'Use light theme' : 'Use dark theme') : (theme === 'dark' ? '切换浅色主题' : '切换深色主题')"><SiteIcon :name="theme === 'dark' ? 'sun' : 'moon'" :size="18" /></button>
         <button type="button" class="lang-toggle" @click="toggleLang" :aria-label="locale === 'zh-CN' ? 'Switch to English' : '切换到中文'"><span :class="{ active: locale === 'zh-CN' }">中</span><span class="lang-divider" aria-hidden="true">/</span><span :class="{ active: locale === 'en' }">EN</span></button>
-        <button ref="menuButton" type="button" class="menu-toggle icon-button" @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen" aria-controls="site-navigation" :aria-label="locale === 'en' ? 'Toggle navigation' : '展开或收起导航'"><SiteIcon :name="mobileOpen ? 'close' : 'menu'" :size="19" /></button>
       </div>
     </div>
   </header>
@@ -59,9 +78,37 @@ watch(() => route.path, () => { mobileOpen.value = false })
 .lang-toggle:hover { background: var(--accent-light); }
 .lang-toggle .active { color: var(--accent); }
 .lang-divider { color: var(--border-strong); }
-.menu-toggle { display: none; }
-@media (max-width: 900px) { .site-nav.is-open { grid-template-columns: repeat(4, minmax(0, 1fr)); } .site-nav a { min-width: 0; white-space: normal; overflow-wrap: anywhere; text-align: center; } }
+.nav-label-compact { display: none; }
 @media (max-width: 1100px) { .header-inner { gap: 8px; padding-inline: 16px; } .site-nav { gap: 0; } .site-nav a { padding-inline: 8px; font-size: 12px; } .logo-caption { display: none; } }
-@media (max-width: 900px) { .site-header { top: 12px; margin-bottom: 24px; } .header-inner { flex-wrap: wrap; min-height: 72px; padding: 12px 16px; } .menu-toggle { display: inline-flex; } .site-nav { display: none; order: 3; width: 100%; border-top: 1px solid var(--border); padding-top: 12px; grid-template-columns: repeat(4, 1fr); gap: 6px; } .site-nav.is-open { display: grid; } .site-nav a { justify-content: center; font-size: 13px; border-radius: var(--radius-sm); padding: 10px 6px; } .site-nav a.is-active { background: var(--accent-light); } .site-nav a::after { display: none; } .logo-caption { display: block; } }
-@media (max-width: 480px) { .logo-caption { font-size: 7px; } .logo-text { font-size: 20px; } .site-logo { gap: 9px; } .header-inner { padding-inline: 12px; } .lang-toggle { gap: 4px; padding-inline: 5px; } .header-actions { gap: 0; } .site-nav.is-open { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 900px) {
+  .site-header { top: max(4px, env(safe-area-inset-top)); margin-bottom: 16px; }
+  .header-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0; min-height: 0; padding: 4px 8px; }
+  .site-logo { gap: 8px; min-height: 44px; width: fit-content; }
+  .logo-mark { width: 18px; height: 23px; }
+  .logo-text { font-size: 19px; }
+  .logo-caption { display: none; }
+  .header-actions { justify-self: end; gap: 0; }
+  .site-nav { display: grid; grid-row: 2; grid-column: 1 / -1; grid-template-columns: repeat(7, minmax(0, 1fr)); width: 100%; gap: 0; padding-top: 2px; border-top: 1px solid var(--border); }
+  .site-nav a { justify-content: center; min-width: 0; min-height: 44px; padding: 6px 1px; font-size: 12px; line-height: 1.35; text-align: center; white-space: normal; overflow-wrap: anywhere; border-radius: 4px; }
+  .site-nav a.is-active { background: var(--accent-light); }
+  .site-nav a::after { display: none; }
+  .nav-label-full { display: none; }
+  .nav-label-compact { display: inline; }
+  .lang-toggle { gap: 5px; padding-inline: 8px; }
+}
+@media (max-width: 359px) { .site-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 700px) and (max-width: 980px) and (max-height: 500px) {
+  .site-header { top: max(4px, env(safe-area-inset-top)); margin-bottom: 16px; }
+  .header-inner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; min-height: 0; padding: 4px 8px; }
+  .site-logo { gap: 7px; min-height: 44px; }
+  .logo-text { font-size: 18px; }
+  .logo-caption { display: none; }
+  .logo-mark { width: 18px; height: 23px; }
+  .site-nav { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-row: 1; grid-column: 2; gap: 0; padding: 0; border: 0; }
+  .site-nav a { justify-content: center; min-width: 0; min-height: 44px; padding: 6px 1px; font-size: 12px; line-height: 1.35; white-space: normal; overflow-wrap: anywhere; text-align: center; border-radius: 4px; }
+  .site-nav a.is-active { background: var(--accent-light); }
+  .site-nav a::after { display: none; }
+  .nav-label-full { display: none; }
+  .nav-label-compact { display: inline; }
+}
 </style>

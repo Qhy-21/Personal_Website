@@ -154,19 +154,31 @@ const profileDetails = computed(() => [
   .about-content, .future-letter { gap: 40px; }
 }
 @media (max-width: 680px) {
-  .profile-section { align-items: stretch; flex-direction: column; padding: 26px 22px; gap: 24px; }
-  .profile-avatar-wrap { flex-basis: 80px; }
-  .profile-avatar { width: 80px; height: 80px; border-radius: 18px; }
-  .profile-identity { gap: 18px; }
-  .profile-identity h2 { font-size: 29px; }
-  .profile-role { font-size: 13px; }
-  .profile-thought { flex-basis: auto; padding: 18px 0 0; border-left: none; border-top: 1px solid var(--border); font-size: 15px; }
-  .about-content, .future-letter { grid-template-columns: 1fr; gap: 42px; }
-  .about-content { margin: 44px 0 48px; }
-  .section-heading { margin-bottom: 19px; }
-  .profile-fact, .profile-links a { font-size: 15px; }
-  .journey-copy p { font-size: 15px; }
-  .future-letter { gap: 22px; padding-top: 30px; }
-  .letter-copy p { font-size: 17px; }
+  .about-page { padding-bottom: 12px; }
+  .profile-section { align-items: stretch; flex-direction: column; padding: 16px; gap: 12px; }
+  .profile-avatar-wrap { flex-basis: 64px; }
+  .profile-avatar { width: 64px; height: 64px; border-radius: 14px; }
+  .profile-identity { gap: 14px; }
+  .profile-alias { margin-bottom: 3px; font-size: 10px; }
+  .profile-identity h2 { font-size: 24px; line-height: 1.35; }
+  .profile-role { margin-top: 5px; font-size: 12px; line-height: 1.65; }
+  .profile-thought { flex-basis: auto; padding: 10px 0 0; border-left: none; border-top: 1px solid var(--border); font-size: 14px; line-height: 1.65; }
+  .about-content, .future-letter { grid-template-columns: 1fr; gap: 24px; }
+  .about-content { margin: 24px 0; }
+  .section-heading { margin-bottom: 12px; }
+  .section-heading h2, .letter-heading h2 { margin-top: 4px; font-size: 21px; line-height: 1.45; }
+  .profile-fact { gap: 12px; padding-block: 8px; font-size: 14px; }
+  .profile-links { margin-top: 12px; gap: 0; }
+  .profile-links a { min-height: 52px; padding-block: 6px; font-size: 14px; }
+  .link-label { margin-bottom: 0; font-size: 11px; }
+  .journey-step { grid-template-columns: 44px minmax(0, 1fr); gap: 22px; padding-bottom: 19px; }
+  .journey-year { font-size: 11px; }
+  .journey-year::after { right: -14px; }
+  .journey-step::before { left: 55px; }
+  .journey-copy h3 { font-size: 14px; line-height: 1.6; }
+  .journey-copy p { margin-top: 4px; font-size: 14px; line-height: 1.75; }
+  .future-letter { gap: 14px; padding-top: 20px; }
+  .letter-copy p { margin-bottom: 8px; font-size: 15px; line-height: 1.75; }
+  .letter-signature { margin-top: 12px; font-size: 12px; }
 }
 </style>

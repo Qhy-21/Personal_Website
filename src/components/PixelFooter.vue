@@ -18,5 +18,5 @@ const year = new Date().getFullYear()
 .footer-note { letter-spacing: .08em; }
 .footer-link { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; color: var(--text-muted); }
 .footer-link:hover { color: var(--accent); }
-@media (max-width: 640px) { .site-footer { flex-wrap: wrap; gap: 12px; margin-top: 40px; padding-top: 20px; } .footer-note { display: none; } .footer-link { font-size: 11px; gap: 8px; } }
+@media (max-width: 640px) { .site-footer { flex-wrap: wrap; gap: 8px; margin-top: 24px; padding-top: 12px; } .footer-note { display: none; } .footer-link { font-size: 11px; gap: 8px; } }
 </style>

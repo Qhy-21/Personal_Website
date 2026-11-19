@@ -319,6 +319,53 @@ function skillName(skill: Skill) {
 @keyframes planetReveal { from { opacity: .4; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 1100px) and (min-width: 981px) { .galaxy-layout { grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr); gap: 20px; } .planet-panel { padding: 24px; } .planet-name { font-size: 11px; } .orbit-card-meta { padding-inline: 18px; } .orbit-coordinate { display: none; } }
 @media (max-width: 980px) { .galaxy-layout { grid-template-columns: 1fr; gap: 24px; } .orbit-card { position: relative; top: auto; } .orbital-stage { padding-inline: 24px; grid-template-rows: repeat(5, minmax(110px, auto)); } .planet-name { max-width: 130px; font-size: 13px; } .planet-kind { font-size: 9px; } .planet-panel { padding: 28px; } .map-return { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: -8px 0 18px; padding: 0; border: 0; background: transparent; color: var(--text-muted); font-size: 13px; line-height: 1.8; } .map-return:hover { color: var(--accent); } .knowledge-core { width: min(100%, 96px); } }
-@media (max-width: 600px) { .knowledge-universe { margin-bottom: 36px; } .orbit-card-meta { padding: 18px 18px 0; } .orbit-coordinate { display: none; } .orbital-stage { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(5, minmax(116px, auto)); column-gap: 4px; row-gap: 10px; padding: 24px 12px 20px; } .planet-0 { grid-area: 1 / 1; } .planet-1 { grid-area: 1 / 3; } .planet-2 { grid-area: 2 / 1; } .planet-3 { grid-area: 2 / 3; } .planet-4 { grid-area: 3 / 1; } .planet-5 { grid-area: 3 / 3; } .planet-6 { grid-area: 4 / 1; } .planet-7 { grid-area: 4 / 3; } .planet-8 { grid-area: 5 / 1; } .planet-9 { grid-area: 5 / 3; } .knowledge-core { grid-column: 2; width: min(100%, 76px); gap: 5px; } .knowledge-core::before { inset: -6px; } .knowledge-core::after { inset: -12px; } .knowledge-core strong { font-size: 12px; } .core-label, .core-foot { font-size: 7px; } .domain-planet { padding-inline: 2px; } .planet-name { font-size: 12px; line-height: 1.6; } .planet-kind { font-size: 8px; } .planet-sphere { width: calc(var(--planet-diameter) - 8px); height: calc(var(--planet-diameter) - 8px); } .map-footer { margin-inline: 18px; gap: 8px; } .map-legend { gap: 10px; } .map-node-count { font-size: 9px; } .planet-panel { padding: 24px 20px; } .panel-heading { gap: 12px; } .panel-heading h2 { font-size: 25px; } .panel-planet-mark { width: 42px; height: 42px; flex-basis: 42px; } .panel-description { font-size: 14px; } .topic-copy { font-size: 14px; } .knowledge-band li { font-size: 13px; } .planet-topics li { gap: 10px; } }
+@media (max-width: 600px) {
+  .knowledge-universe { margin-bottom: 24px; }
+  .universe-summary { gap: 7px; font-size: 11px; }
+  .universe-summary strong { font-size: 22px; }
+  .galaxy-layout { gap: 14px; }
+  .orbit-card, .planet-panel { scroll-margin-top: 0; }
+  .orbit-card-meta { padding: 12px 14px 0; font-size: 10px; }
+  .orbit-coordinate { display: none; }
+  .orbital-stage { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(66px, auto)); gap: 8px 10px; padding: 16px 12px 12px; }
+  .planet-0 { grid-area: 1 / 1; } .planet-1 { grid-area: 1 / 2; } .planet-2 { grid-area: 1 / 3; }
+  .planet-3 { grid-area: 2 / 1; } .planet-4 { grid-area: 2 / 3; }
+  .planet-5 { grid-area: 3 / 1; } .planet-6 { grid-area: 3 / 3; }
+  .planet-7 { grid-area: 4 / 1; } .planet-8 { grid-area: 4 / 2; } .planet-9 { grid-area: 4 / 3; }
+  .knowledge-core { grid-area: 2 / 2 / 4 / 3; width: min(100%, 64px); gap: 3px; padding: 8px 4px; }
+  .knowledge-core::before { inset: -5px; }
+  .knowledge-core::after { inset: -10px; }
+  .knowledge-core strong { font-size: 11px; }
+  .core-label { font-size: 7px; }
+  .core-foot { display: none; }
+  .domain-planet { min-height: 66px; gap: 5px; padding: 3px 1px; }
+  .planet-name { font-size: 11.5px; line-height: 1.4; }
+  .planet-kind { display: none; }
+  .planet-sphere { width: calc(var(--planet-diameter) - 22px); height: calc(var(--planet-diameter) - 22px); min-width: 32px; min-height: 32px; }
+  .planet-mark { font-size: 9px; }
+  .planet-sphere::after { inset: 3px; }
+  .planet-orbit { inset: -4px; }
+  .planet-selected { width: 14px; height: 14px; right: -4px; top: -3px; }
+  .map-footer { margin-inline: 14px; gap: 4px 10px; padding: 10px 0; font-size: 10px; }
+  .map-legend { gap: 10px; }
+  .map-node-count { font-size: 9px; }
+  .planet-panel { padding: 16px; }
+  .map-return { margin: -4px 0 8px; min-height: 44px; font-size: 12px; }
+  .panel-heading { gap: 10px; }
+  .panel-heading h2 { font-size: 22px; margin-top: 6px; line-height: 1.4; }
+  .panel-kicker { font-size: 9px; }
+  .panel-planet-mark { width: 36px; height: 36px; flex-basis: 36px; font-size: 10px; }
+  .panel-description { margin: 12px 0 14px; font-size: 13px; line-height: 1.8; }
+  .panel-stats { padding: 10px 0; gap: 5px 12px; }
+  .knowledge-bands { gap: 18px; margin-top: 18px; }
+  .knowledge-band h3 { margin-bottom: 8px; }
+  .knowledge-band ul { gap: 6px; }
+  .knowledge-band li { padding: 6px 8px; gap: 6px; font-size: 13px; line-height: 1.6; }
+  .planet-topics { margin-top: 4px; }
+  .planet-topics li { grid-template-columns: 17px minmax(0, 1fr); gap: 8px; padding: 12px 0; }
+  .topic-copy { font-size: 13px; line-height: 1.8; }
+  .learning-note { padding: 12px 14px; margin-top: 18px; }
+  .universe-colophon { margin-top: 16px; gap: 6px; font-size: 10px; }
+}
 @media (prefers-reduced-motion: reduce) { .panel-content { animation: none; } .planet-sphere, .planet-orbit { transition: none; } .domain-planet:hover .planet-sphere { transform: none; } }
 </style>
