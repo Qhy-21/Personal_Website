@@ -71,7 +71,6 @@ function locationLabel(value) {
   max-width: min(420px, 92vw); width: 100%;
   max-height: 82vh; overflow-y: auto;
   background: var(--bg-elevated);
-  backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   padding: 64px 28px 28px;

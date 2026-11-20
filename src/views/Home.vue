@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, shallowRef } from 'vue'
+import { computed, defineAsyncComponent, defineComponent, h, nextTick, onMounted, onUnmounted, shallowRef, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import interestsData from '../data/interests.js'
-import InterestModal from '../components/InterestModal.vue'
 import VisitorStats from '../components/VisitorStats.vue'
 import SiteIcon from '../components/SiteIcon.vue'
 import { useDialog } from '../composables/useDialog'
@@ -15,6 +14,36 @@ type Visit = { country: string; city: string; time: string }
 const { t, locale } = useI18n()
 const isEnglish = computed(() => locale.value === 'en')
 const activeInterest = shallowRef<Interest | null>(null)
+function interestLoadState(failed: boolean, dialogRef: Ref<HTMLElement | null>) {
+  return h('div', { class: 'home-modal', onClick: (event: MouseEvent) => { if (event.target === event.currentTarget) onInterestClose() } }, [
+    h('div', { ref: dialogRef, class: 'interest-load-state', role: 'dialog', tabindex: -1, 'aria-modal': 'true', 'aria-label': isEnglish.value ? 'Interest details' : '兴趣详情' }, [
+      h('p', { role: failed ? 'alert' : 'status' }, failed
+        ? (isEnglish.value ? 'The details could not be loaded. Reload the page to try again.' : '详情未能加载，请重新加载页面后重试。')
+        : (isEnglish.value ? 'Loading details…' : '正在加载详情…')),
+      ...(failed ? [h('button', { type: 'button', class: 'btn', onClick: () => window.location.reload() }, isEnglish.value ? 'Reload page' : '重新加载页面')] : []),
+      h('button', { type: 'button', class: 'btn btn-ghost', onClick: onInterestClose }, isEnglish.value ? 'Close' : '关闭'),
+    ]),
+  ])
+}
+function interestStateComponent(failed: boolean) {
+  return defineComponent({
+    setup() {
+      const open = computed({ get: () => Boolean(activeInterest.value), set: value => { if (!value) onInterestClose() } })
+      const { dialogRef } = useDialog(open)
+      return () => interestLoadState(failed, dialogRef)
+    },
+  })
+}
+function createInterestModal() {
+  return defineAsyncComponent({
+    loader: () => import('../components/InterestModal.vue'),
+    delay: 120,
+    timeout: 15000,
+    loadingComponent: interestStateComponent(false),
+    errorComponent: interestStateComponent(true),
+  })
+}
+const InterestModal = shallowRef(createInterestModal())
 const dismissedTags = shallowRef(new Set<string>())
 const avatarModalOpen = shallowRef(false)
 const qrModalOpen = shallowRef(false)
@@ -112,7 +141,7 @@ onUnmounted(() => visitorRequest.abort())
     <Transition name="modal"><div v-if="avatarModalOpen" class="home-modal" @click.self="avatarModalOpen = false"><div ref="avatarDialogRef" class="avatar-dialog" role="dialog" aria-modal="true" :aria-label="isEnglish ? 'Illustration' : '插画大图'" tabindex="-1"><button type="button" class="dialog-close icon-button" @click="avatarModalOpen = false" :aria-label="isEnglish ? 'Close' : '关闭'"><SiteIcon name="close" /></button><img :src="AVATAR" width="540" height="540" :alt="isEnglish ? 'A white car beside a golden field' : '停在金色田野旁的白色小车'"></div></div></Transition>
     <Transition name="modal"><div v-if="qrModalOpen" class="home-modal" @click.self="qrModalOpen = false"><div ref="qrDialogRef" class="qr-dialog" role="dialog" aria-modal="true" aria-labelledby="qr-title" tabindex="-1"><button type="button" class="dialog-close icon-button" @click="qrModalOpen = false" :aria-label="isEnglish ? 'Close' : '关闭'"><SiteIcon name="close" /></button><p class="eyebrow">NICE TO MEET YOU</p><h2 id="qr-title">{{ isEnglish ? 'Let’s be friends.' : '很高兴，你看到了这里。' }}</h2><img src="/wechat-qr.jpg" width="200" height="200" :alt="isEnglish ? 'WeChat QR code' : '微信二维码'"><p>{{ t('home.qrFriendText') }}</p></div></div></Transition>
   </Teleport>
-  <InterestModal :interest="activeInterest" :locale="locale" @close="onInterestClose" />
+  <InterestModal v-if="activeInterest" :interest="activeInterest" :locale="locale" @close="onInterestClose" />
   <VisitorStats :total="visitorOpen ? visitorTotal : null" :countries="visitorCountries" :recent="visitorRecent" :locale="locale" @close="visitorOpen = false" />
 </template>
 
@@ -162,6 +191,8 @@ onUnmounted(() => visitorRequest.abort())
 .visitor-count:hover { color: var(--accent); }
 .visitor-unavailable { align-self: center; color: var(--text-muted); font-size: 11px; }
 .home-modal { position: fixed; inset: 0; z-index: 220; display: grid; place-items: center; padding: 24px; background: rgba(20, 15, 30, .62); backdrop-filter: blur(8px); }
+.interest-load-state { width: min(100%, 420px); padding: 28px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-card); color: var(--text); }
+.interest-load-state .btn { margin: 12px 10px 0 0; }
 .avatar-dialog { position: relative; background: var(--bg-card); border-radius: var(--radius-md); padding: 10px; max-width: 560px; max-height: 88dvh; outline: none; }
 .avatar-dialog > img { display: block; width: auto; height: auto; max-height: 82dvh; object-fit: contain; border-radius: var(--radius-sm); }
 .dialog-close { position: absolute; right: 18px; top: 18px; z-index: 1; background: var(--bg-card); color: var(--text); }

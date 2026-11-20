@@ -50,7 +50,7 @@ const walineLang = computed(() => isEnglish.value ? 'en' : 'zh-CN')
 .guestbook-page { padding-bottom: 32px; }
 .guestbook-note { display: block; color: var(--text-muted); font-family: var(--font-display); font-size: 15px; }
 .guestbook-layout { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1.7fr); align-items: start; gap: clamp(32px, 5vw, 64px); }
-.guestbook-welcome { position: sticky; top: 128px; align-self: start; max-height: calc(100dvh - 152px); overflow-y: auto; padding-top: 26px; }
+.guestbook-welcome { position: sticky; top: var(--header-offset, 128px); align-self: start; max-height: calc(100dvh - var(--header-offset, 128px) - 24px); overflow-y: auto; padding-top: 26px; }
 .welcome-pixel { display: block; width: 12px; height: 12px; margin-bottom: 25px; border-radius: 3px; background: var(--accent-light); box-shadow: 5px -5px 0 var(--accent); }
 .guestbook-welcome h2 { margin: 0 0 15px; font-family: var(--font-display); font-size: 23px; font-weight: 500; line-height: 1.7; }
 .guestbook-welcome p { margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.9; }

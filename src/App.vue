@@ -5,6 +5,8 @@ import { useI18n } from 'vue-i18n'
 import PixelHeader from './components/PixelHeader.vue'
 import PixelFooter from './components/PixelFooter.vue'
 import MatrixRain from './components/MatrixRain.vue'
+import { useSharedCardLight } from './composables/useSharedCardLight'
+useSharedCardLight()
 const { t, locale } = useI18n()
 const route = useRoute()
 const splashDone = shallowRef(false)

@@ -105,6 +105,49 @@ img { max-width: 100%; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* One pointer light, projected into each card. The fill is never painted over. */
+@property --card-light-x { syntax: '<length>'; inherits: false; initial-value: -600px; }
+@property --card-light-y { syntax: '<length>'; inherits: false; initial-value: -600px; }
+@property --card-light-visible { syntax: '<number>'; inherits: false; initial-value: 0; }
+[data-card-light] { position: relative; }
+.card-light-layer { display: none; }
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  [data-card-light] > .card-light-layer {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: radial-gradient(360px circle at var(--card-light-x, -600px) var(--card-light-y, -600px), var(--accent-strong) 0%, var(--accent) 22%, transparent 76%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: var(--card-light-visible);
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+}
+@media (hover: none) and (pointer: coarse) { .card-light-layer { display: none !important; } }
+
+/* Intrinsic sizing lets native disclosure content follow its actual height. */
+.animated-details { interpolate-size: allow-keywords; }
+.animated-details > summary { cursor: pointer; min-height: 44px; list-style: none; }
+.animated-details > summary::-webkit-details-marker { display: none; }
+.animated-details > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.animated-details .disclosure-chevron { transition: transform 240ms var(--ease-out); }
+.animated-details[open] > summary .disclosure-chevron { transform: rotate(90deg); }
+@supports (interpolate-size: allow-keywords) and selector(details::details-content) {
+  .animated-details::details-content {
+    height: 0;
+    opacity: 0;
+    overflow: clip;
+    transition: height 300ms var(--ease-out), opacity 200ms ease, content-visibility 300ms allow-discrete;
+  }
+  .animated-details[open]::details-content { height: auto; opacity: 1; }
+}
 @media (max-width: 768px) { .pixel-page { padding: 10px 18px 20px; } .section { margin-bottom: 28px; } .section-dark, .pixel-card { padding: 20px; } }
 @media (max-width: 640px) { .pixel-page { padding: 6px 12px 20px; } .section { margin-bottom: 24px; } .section-dark, .pixel-card { padding: 16px; border-radius: 14px; } .section-title { margin-bottom: 16px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }

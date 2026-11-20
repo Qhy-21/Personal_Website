@@ -388,7 +388,7 @@ watch(() => route.fullPath, load)
 .breadcrumb-entry { color: var(--text-muted); overflow-wrap: anywhere; }
 .detail-loading, .detail-empty { text-align: center; padding: 96px 24px; color: var(--text-muted); font-size: 16px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-lg); }
 .reader-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: flex-start; }
-.article-sidebar { position: sticky; top: 112px; max-height: calc(100dvh - 144px); overflow-y: auto; scrollbar-width: thin; padding-right: 12px; }
+.article-sidebar { position: sticky; top: var(--header-offset, 112px); max-height: calc(100dvh - var(--header-offset, 112px) - 32px); overflow-y: auto; scrollbar-width: thin; padding-right: 12px; }
 .sidebar-header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 16px; padding: 0 10px 16px; border-bottom: 1px solid var(--border); }
 .sidebar-title { font-family: var(--font-display); font-size: 20px; font-weight: 500; color: var(--text); }
 .sidebar-count { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }

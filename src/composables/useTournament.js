@@ -4,6 +4,42 @@ import { shuffle } from '../utils/shuffle.js'
 
 const STORAGE_KEY = 'xusong-bot-state'
 const flatSongList = getFlatSongList()
+const songIds = new Set(flatSongList.map(song => song.id))
+
+function validSong(song) {
+  return song && songIds.has(song.id) && typeof song.title === 'string' && typeof song.album === 'string'
+}
+
+function validMatch(match, allowSolo = false) {
+  return match && validSong(match.songA) && (validSong(match.songB) || (allowSolo && match.songB === null)) &&
+    [null, 'A', 'B', 'tie'].includes(match.winner) &&
+    (match.songB !== null || match.winner === 'A')
+}
+
+function validState(state) {
+  if (!state || !['voting', 'complete'].includes(state.phase) || !Number.isInteger(state.round) || state.round < 1 ||
+    !Number.isInteger(state.currentMatchIdx) || state.currentMatchIdx < 0 ||
+    !Array.isArray(state.roundMatches) || !state.roundMatches.every(match => validMatch(match)) ||
+    state.currentMatchIdx > state.roundMatches.length ||
+    !Array.isArray(state.roundByes) || !state.roundByes.every(validSong) ||
+    !Array.isArray(state.skippedQueue) || !state.skippedQueue.every(match => validMatch(match) && match.winner === null) ||
+    !Array.isArray(state.allRounds) || !state.allRounds.every(item => item && Number.isInteger(item.round) && item.round > 0 &&
+      Array.isArray(item.matches) && item.matches.every(match => validMatch(match, true) && match.winner !== null))) return false
+  if (state.phase === 'complete') {
+    return state.allRounds.length > 0 && state.allRounds.at(-1).matches.length > 0
+  }
+  return (state.roundMatches.length > 0 || state.skippedQueue.length > 0) &&
+    state.roundMatches.every((match, index) => index < state.currentMatchIdx ? match.winner !== null : match.winner === null)
+}
+
+function readSavedState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    const state = JSON.parse(raw)
+    return validState(state) ? state : null
+  } catch { return null }
+}
 
 function generateRound(participants) {
   const shuffled = shuffle(participants)
@@ -86,23 +122,22 @@ export function useTournament() {
   }
 
   function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (!raw) return false
-      const s = JSON.parse(raw)
-      round.value = s.round
-      roundMatches.value = s.roundMatches
-      currentMatchIdx.value = s.currentMatchIdx
-      roundByes.value = s.roundByes
-      allRounds.value = s.allRounds
-      skippedQueue.value = s.skippedQueue
-      phase.value = s.phase
-      return true
-    } catch { return false }
+    const s = readSavedState()
+    if (!s) return false
+    round.value = s.round
+    roundMatches.value = s.roundMatches
+    currentMatchIdx.value = s.currentMatchIdx
+    roundByes.value = s.roundByes
+    allRounds.value = s.allRounds
+    skippedQueue.value = s.skippedQueue
+    phase.value = s.phase
+    historyStack.value = []
+    if (phase.value === 'voting' && !currentMatch.value) finishCurrentRound()
+    return true
   }
 
   function hasSavedState() {
-    return !!localStorage.getItem(STORAGE_KEY)
+    return readSavedState() !== null
   }
 
   function initTournament() {
@@ -161,13 +196,13 @@ export function useTournament() {
   }
 
   function vote(choice) {
-    if (!currentMatch.value || phase.value !== 'voting') return
+    if (!['A', 'B'].includes(choice) || !currentMatch.value || phase.value !== 'voting') return
     pushSnapshot()
     roundMatches.value[currentMatchIdx.value].winner = choice
     currentMatchIdx.value++
 
     if (currentMatchIdx.value >= roundMatches.value.length) {
-      advanceRound()
+      finishCurrentRound()
     } else {
       persist()
     }
@@ -179,7 +214,7 @@ export function useTournament() {
     const match = roundMatches.value.splice(currentMatchIdx.value, 1)[0]
     skippedQueue.value = [...skippedQueue.value, match]
     if (currentMatchIdx.value >= roundMatches.value.length) {
-      advanceRound()
+      finishCurrentRound()
     } else {
       persist()
     }
@@ -203,7 +238,7 @@ export function useTournament() {
     currentMatchIdx.value++
 
     if (currentMatchIdx.value >= roundMatches.value.length) {
-      advanceRound()
+      finishCurrentRound()
     } else {
       persist()
     }
@@ -235,9 +270,18 @@ export function useTournament() {
   }
 
   function resumeFromSaved() {
-    historyStack.value = []
-    phase.value = 'voting'
-    persist()
+    return loadState()
+  }
+
+  function finishCurrentRound() {
+    // Saved matchups still belong to this round: resolve them before advancing.
+    if (skippedQueue.value.length) {
+      roundMatches.value = [...roundMatches.value, ...shuffle(skippedQueue.value)]
+      skippedQueue.value = []
+      persist()
+      return
+    }
+    advanceRound()
   }
 
   return {

@@ -7,7 +7,7 @@ const md = new MarkdownIt({
 })
 
 // ===== 从 Vite 加载三个分类的合并 MD 文件 =====
-const rawModules = import.meta.glob('../data/**/*.md', { query: '?raw', import: 'default', eager: true })
+const rawModules = import.meta.glob('../data/{articles,essays,poems}/*.md', { query: '?raw', import: 'default', eager: true })
 
 function getRaw(category) {
   // 路径映射：articles -> articles/articles.md；essays -> essays/essays.md；poems -> poems/poems.md

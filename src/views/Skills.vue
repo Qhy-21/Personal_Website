@@ -240,7 +240,7 @@ function skillName(skill: Skill) {
 .universe-summary strong { font-family: var(--font-display); color: var(--accent); font-size: 34px; font-weight: 500; line-height: 1; }
 .galaxy-layout { display: grid; grid-template-columns: minmax(0, 1.42fr) minmax(340px, 1fr); gap: 24px; align-items: start; }
 .orbit-card, .planet-panel { min-width: 0; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-card); }
-.orbit-card { position: sticky; top: 116px; scroll-margin-top: 120px; isolation: isolate; background: radial-gradient(ellipse at 50% 46%, var(--accent-light), transparent 42%), radial-gradient(ellipse at 9% 12%, color-mix(in srgb, var(--violet) 7%, transparent), transparent 36%), var(--bg-card); }
+.orbit-card { position: sticky; top: var(--header-offset, 116px); scroll-margin-top: 0; isolation: isolate; background: radial-gradient(ellipse at 50% 46%, var(--accent-light), transparent 42%), radial-gradient(ellipse at 9% 12%, color-mix(in srgb, var(--violet) 7%, transparent), transparent 36%), var(--bg-card); }
 .orbit-card::before { position: absolute; z-index: -1; inset: 0; content: ''; border-radius: inherit; background-image: radial-gradient(circle, var(--text-muted) .65px, transparent 1px); background-size: 37px 41px; opacity: .14; pointer-events: none; }
 .orbit-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding: 22px 24px 0; color: var(--text-muted); font-family: var(--font-mono); font-size: 10px; line-height: 1.6; letter-spacing: .04em; }
 .orbit-card-meta > span:first-child { display: inline-flex; align-items: center; gap: 8px; }

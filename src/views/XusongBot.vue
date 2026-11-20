@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, shallowRef, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTournament } from '../composables/useTournament.js'
 import SongCard from '../components/SongCard.vue'
 import BracketTree from '../components/BracketTree.vue'
 import PageIntro from '../components/PageIntro.vue'
 import SiteIcon from '../components/SiteIcon.vue'
+import { useDialog } from '../composables/useDialog'
+import { getFlatSongList } from '../data/xusongSongs/index.js'
 import teaCover from '../data/interests/vae/不如吃茶去.jpg'
 import breathCover from '../data/interests/vae/呼吸之野.jpg'
 import debutCover from '../data/interests/vae/自定义.jpg'
@@ -13,37 +15,77 @@ import debutCover from '../data/interests/vae/自定义.jpg'
 const { t, locale } = useI18n()
 const isEnglish = computed(() => locale.value === 'en')
 const albumCovers = [debutCover, teaCover, breathCover]
+const songList = getFlatSongList()
+const songRows = Array.from({ length: 3 }, (_, row) => songList.filter((_, index) => index % 3 === row))
 const {
   round, phase, currentMatch, totalMatches, votedCount, progress,
   hasSkipped, canUndo, totalSongs, champions,
   allRounds, skippedQueue,
   initTournament, vote, skipCurrent, pass, pickRandomSkipped, undo, clearAll,
-  loadState, hasSavedState, resumeFromSaved,
+  loadState,
 } = useTournament()
 
-const showingResume = ref(false)
+const resumeNotice = ref<'voting' | 'complete' | null>(null)
 const bracketRef = ref<HTMLElement | null>(null)
+const voteAreaRef = ref<HTMLElement | null>(null)
 const exporting = ref(false)
 const confirmAction = ref<{ type: 'restart' | 'clear' | 'export' } | null>(null)
-const showLiveBracket = ref(false)
+const confirmOpen = computed({ get: () => confirmAction.value !== null, set: value => { if (!value) confirmAction.value = null } })
+const { dialogRef: confirmDialogRef } = useDialog(confirmOpen)
+const userPaused = ref(false)
+const reduceMotion = ref(false)
+const marqueePaused = computed(() => userPaused.value || reduceMotion.value)
+const songFieldRef = shallowRef<HTMLElement | null>(null)
+const documentVisible = shallowRef(!document.hidden)
+const pageReady = shallowRef(false)
+const marqueeRunning = computed(() => !marqueePaused.value && documentVisible.value && pageReady.value)
+let motionPreference: MediaQueryList | null = null
+let ribbonObserver: IntersectionObserver | null = null
+let pageReadyObserver: MutationObserver | null = null
+function updateMotionPreference() { reduceMotion.value = motionPreference?.matches ?? false }
+function updateDocumentVisibility() { documentVisible.value = !document.hidden }
 
 onMounted(() => {
-  if (hasSavedState()) {
-    showingResume.value = true
+  motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+  updateMotionPreference()
+  motionPreference.addEventListener('change', updateMotionPreference)
+  document.addEventListener('visibilitychange', updateDocumentVisibility)
+  ribbonObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => entry.target.classList.toggle('is-in-view', entry.isIntersecting))
+  }, { rootMargin: '80px 0px' })
+  songFieldRef.value?.querySelectorAll('.song-ribbon').forEach(ribbon => ribbonObserver?.observe(ribbon))
+  const page = songFieldRef.value?.closest<HTMLElement>('.pixel-page')
+  const updatePageReady = () => { pageReady.value = !page?.inert }
+  updatePageReady()
+  if (page?.inert) {
+    pageReadyObserver = new MutationObserver(() => {
+      updatePageReady()
+      if (pageReady.value) { pageReadyObserver?.disconnect(); pageReadyObserver = null }
+    })
+    pageReadyObserver.observe(page, { attributes: true, attributeFilter: ['inert'] })
   }
+  if (loadState()) resumeNotice.value = phase.value === 'complete' ? 'complete' : 'voting'
 })
+onUnmounted(() => {
+  motionPreference?.removeEventListener('change', updateMotionPreference)
+  document.removeEventListener('visibilitychange', updateDocumentVisibility)
+  ribbonObserver?.disconnect()
+  pageReadyObserver?.disconnect()
+})
+watch(phase, value => { if (value === 'complete') resumeNotice.value = 'complete' })
 
 function handleResume() {
-  loadState()
-  resumeFromSaved()
-  showingResume.value = false
+  resumeNotice.value = null
+  voteAreaRef.value?.querySelector<HTMLButtonElement>('.song-card')?.focus({ preventScroll: true })
 }
 
 function handleNewGame() {
-  clearAll()
-  showingResume.value = false
+  if (phase.value !== 'idle') { handleRestart(); return }
+  resumeNotice.value = null
   initTournament()
 }
+
+function play(action: () => void) { resumeNotice.value = null; action() }
 
 function handleRestart() {
   confirmAction.value = { type: 'restart' }
@@ -61,8 +103,10 @@ function doConfirm() {
   const type = confirmAction.value?.type
   confirmAction.value = null
   if (type === 'restart') {
+    resumeNotice.value = null
     initTournament()
   } else if (type === 'clear') {
+    resumeNotice.value = null
     clearAll()
   } else if (type === 'export') {
     doExport()
@@ -82,6 +126,18 @@ async function doExport() {
     const canvas = await html2canvas(el, {
       backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-base').trim() || '#0f0f18',
       scale: 2,
+      onclone: (document) => {
+        document.querySelectorAll('.card-light-layer').forEach(decoration => decoration.remove())
+        document.querySelectorAll('html2canvaspseudoelement').forEach(decoration => decoration.remove())
+        document.querySelectorAll('[data-card-light]').forEach(card => card.removeAttribute('data-card-light'))
+        document.querySelectorAll('details.animated-details').forEach(details => {
+          const expanded = document.createElement('div')
+          expanded.className = details.className
+          expanded.setAttribute('open', '')
+          expanded.append(...details.childNodes)
+          details.replaceWith(expanded)
+        })
+      },
     })
     canvas.toBlob((blob) => {
       if (!blob) {
@@ -111,29 +167,41 @@ function confirmDesc(type: string) {
 
 <template>
   <section class="xusong-page" :class="{ 'is-complete': phase === 'complete' }">
+    <div ref="songFieldRef" class="song-field" :class="{ 'is-running': marqueeRunning }" aria-hidden="true">
+      <div v-for="(songs, row) in songRows" :key="row" v-memo="[row]" class="song-ribbon" :class="`song-ribbon-${row}`">
+        <div class="song-ribbon-track">
+          <div v-for="copy in 2" :key="copy" class="song-ribbon-copy">
+            <span v-for="song in songs" :key="song.id">{{ song.title }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <PageIntro
       eyebrow="SOME SONGS STAY WITH US"
       :title="t('xusongBot.title')"
       :description="isEnglish ? 'Some songs become part of your story. Pick the ones you would always come back to.' : '总有一些歌，陪你走过某段日子。一首一首选，留下最偏爱的那首。'"
     >
-      <span class="collection-meta"><SiteIcon name="music" :size="16" />{{ t('xusongBot.subtitle', { n: totalSongs }) }}</span>
+      <div class="collection-tools">
+        <span class="collection-meta"><SiteIcon name="music" :size="16" />{{ t('xusongBot.subtitle', { n: totalSongs }) }}</span>
+        <button type="button" class="motion-toggle" :aria-pressed="marqueePaused" :disabled="reduceMotion" @click="userPaused = !userPaused">
+          <span aria-hidden="true">{{ marqueePaused ? '▷' : 'Ⅱ' }}</span>{{ reduceMotion ? t('xusongBot.motionReduced') : marqueePaused ? t('xusongBot.motionPlay') : t('xusongBot.motionPause') }}
+        </button>
+      </div>
     </PageIntro>
 
-    <!-- Resume modal -->
-    <div v-if="showingResume" class="phase-wrap">
-      <div class="pixel-card resume-card">
-        <div class="resume-icon"><SiteIcon name="music" :size="28" /></div>
-        <h2 class="resume-title">{{ t('xusongBot.resumeTitle') }}</h2>
-        <p class="resume-desc">{{ t('xusongBot.resumeDesc') }}</p>
-        <div class="resume-actions">
-          <button class="bot-btn primary" @click="handleResume">{{ t('xusongBot.resumeContinue') }}</button>
-          <button class="bot-btn" @click="handleNewGame">{{ t('xusongBot.resumeNew') }}</button>
+    <Transition name="resume-note">
+      <div v-if="resumeNotice" class="resume-notice phase-wrap" role="status">
+        <p><SiteIcon name="music" :size="16" />{{ resumeNotice === 'complete' ? t('xusongBot.completeNotice') : t('xusongBot.resumeTitle') }}</p>
+        <div class="notice-actions">
+          <button v-if="resumeNotice === 'voting'" type="button" class="notice-action notice-continue" @click="handleResume">{{ t('xusongBot.resumeContinue') }}</button>
+          <button type="button" class="notice-action notice-restart" @click="handleRestart">{{ t('xusongBot.resumeNew') }}</button>
+          <button type="button" class="notice-close" :aria-label="t('xusongBot.dismissNotice')" @click="resumeNotice = null"><SiteIcon name="close" :size="16" /></button>
         </div>
       </div>
-    </div>
+    </Transition>
 
     <!-- Voting phase -->
-    <div v-if="phase === 'voting' && !showingResume" class="phase-wrap">
+    <div v-if="phase === 'voting'" class="phase-wrap">
       <div class="stats-row">
         <span class="stat-item">{{ t('xusongBot.round', { n: round }) }}</span>
         <span class="stat-item">{{ t('xusongBot.progress', { voted: votedCount, total: totalMatches }) }}</span>
@@ -144,32 +212,32 @@ function confirmDesc(type: string) {
         <div class="progress-fill" :style="{ transform: `scaleX(${progress / 100})` }"></div>
       </div>
 
-      <div v-if="currentMatch" class="vote-area">
+      <div v-if="currentMatch" ref="voteAreaRef" class="vote-area">
         <div class="vote-cards">
           <SongCard
             :song="currentMatch.songA"
-            @pick="vote('A')"
+            @pick="play(() => vote('A'))"
           />
           <div class="vs-badge">
             <span class="vs-text">VS</span>
           </div>
           <SongCard
             :song="currentMatch.songB"
-            @pick="vote('B')"
+            @pick="play(() => vote('B'))"
           />
         </div>
       </div>
 
       <div class="action-bar">
-        <button class="bot-btn" :disabled="!canUndo" @click="undo">{{ t('xusongBot.undo') }}</button>
-        <button class="bot-btn" :title="t('xusongBot.skipTitle')" @click="skipCurrent">{{ t('xusongBot.skip') }}</button>
-        <button class="bot-btn pass-btn" :title="t('xusongBot.passTitle')" @click="pass">{{ t('xusongBot.pass') }}</button>
+        <button class="bot-btn" :disabled="!canUndo" @click="play(undo)">{{ t('xusongBot.undo') }}</button>
+        <button class="bot-btn" :title="t('xusongBot.skipTitle')" @click="play(skipCurrent)">{{ t('xusongBot.skip') }}</button>
+        <button class="bot-btn pass-btn" :title="t('xusongBot.passTitle')" @click="play(pass)">{{ t('xusongBot.pass') }}</button>
         <button
           class="bot-btn accent-btn"
           :class="{ 'has-items': hasSkipped }"
           :disabled="!hasSkipped"
           :title="t('xusongBot.randomSkipTitle')"
-          @click="pickRandomSkipped"
+          @click="play(pickRandomSkipped)"
         >{{ t('xusongBot.randomSkip') }}</button>
       </div>
 
@@ -177,18 +245,18 @@ function confirmDesc(type: string) {
       <p class="hint-text">{{ t('xusongBot.hint') }}</p>
 
       <!-- Live bracket -->
-      <div v-if="allRounds.length" class="live-bracket-section">
-        <button class="live-bracket-toggle" :aria-expanded="showLiveBracket" aria-controls="live-bracket" @click="showLiveBracket = !showLiveBracket">
-          <span class="bracket-toggle-mark" aria-hidden="true">{{ showLiveBracket ? '−' : '+' }}</span> {{ t('xusongBot.liveBracket', { n: allRounds.length }) }}
-        </button>
-        <div v-if="showLiveBracket" id="live-bracket" class="live-bracket-body">
+      <details v-if="allRounds.length" class="live-bracket-section animated-details" name="xusong-panels">
+        <summary class="live-bracket-toggle">
+          <span class="bracket-toggle-mark" aria-hidden="true"></span>{{ t('xusongBot.liveBracket', { n: allRounds.length }) }}
+        </summary>
+        <div class="live-bracket-body">
           <BracketTree :all-rounds="allRounds" />
         </div>
-      </div>
+      </details>
     </div>
 
     <!-- Complete phase -->
-    <div v-if="phase === 'complete' && !showingResume" class="phase-wrap complete-phase">
+    <div v-if="phase === 'complete'" class="phase-wrap complete-phase">
       <div v-if="champions.length" class="champion-card">
         <div class="champion-label">{{ champions.length === 1 ? t('xusongBot.champion') : t('xusongBot.champions') }}</div>
         <div class="champion-list">
@@ -216,7 +284,7 @@ function confirmDesc(type: string) {
     </div>
 
     <!-- Idle phase -->
-    <div v-if="phase === 'idle' && !showingResume" class="phase-wrap">
+    <div v-if="phase === 'idle'" class="phase-wrap">
       <div class="idle-card pixel-card">
         <div class="record-collection" aria-hidden="true">
           <div v-for="(cover, index) in albumCovers" :key="cover" class="record-sleeve" :class="`sleeve-${index}`">
@@ -236,7 +304,7 @@ function confirmDesc(type: string) {
     <!-- Confirm dialog -->
     <Teleport to="body">
       <div v-if="confirmAction" class="xusong-confirm-overlay" @click.self="doCancel">
-        <div class="xusong-confirm-card" role="dialog" aria-modal="true" aria-labelledby="xusong-confirm-title" aria-describedby="xusong-confirm-description">
+        <div ref="confirmDialogRef" class="xusong-confirm-card" role="dialog" aria-modal="true" aria-labelledby="xusong-confirm-title" aria-describedby="xusong-confirm-description" tabindex="-1">
           <h2 id="xusong-confirm-title" class="xusong-confirm-title">{{ t('xusongBot.confirmTitle') }}</h2>
           <p id="xusong-confirm-description" class="xusong-confirm-desc">{{ confirmDesc(confirmAction.type) }}</p>
           <div class="xusong-confirm-actions">
@@ -250,7 +318,36 @@ function confirmDesc(type: string) {
 </template>
 
 <style scoped>
-.xusong-page { padding-bottom: 40px; }
+.xusong-page { position: relative; isolation: isolate; padding-bottom: 40px; }
+.song-field { position: absolute; z-index: -1; inset: 90px 0 0; overflow: hidden; contain: layout paint; pointer-events: none; mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+.song-ribbon { position: absolute; left: 0; width: 100%; overflow: hidden; contain: layout paint; color: var(--text-muted); opacity: .24; }
+[data-theme="light"] .song-ribbon { opacity: .26; }
+.song-ribbon-0 { top: 8%; }
+.song-ribbon-1 { top: 43%; }
+.song-ribbon-2 { top: 78%; }
+.song-ribbon-track { display: flex; width: max-content; transform: translate3d(0, 0, 0); animation: songsDrift 180s linear infinite paused; }
+.song-ribbon-1 .song-ribbon-track { animation-duration: 210s; animation-direction: reverse; }
+.song-ribbon-2 .song-ribbon-track { animation-duration: 240s; }
+.song-ribbon-copy { display: flex; flex: 0 0 auto; align-items: center; gap: 24px; padding-right: 24px; }
+.song-ribbon-copy span { font-family: var(--font-display); font-size: 26px; line-height: 1.35; white-space: nowrap; }
+.song-field.is-running .song-ribbon.is-in-view .song-ribbon-track { animation-play-state: running; will-change: transform; }
+@keyframes songsDrift { to { transform: translate3d(-50%, 0, 0); } }
+.collection-tools { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.motion-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 4px 10px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text-muted); font: 12px/1.5 var(--font-body); }
+.motion-toggle:hover:not(:disabled) { background: var(--accent-light); color: var(--accent-strong); }
+.motion-toggle:disabled { cursor: default; }
+.motion-toggle span { font-size: 15px; }
+.resume-notice { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; margin-bottom: 22px; padding: 8px 12px 8px 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-card); }
+.resume-notice p { display: flex; align-items: center; gap: 9px; margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.7; }
+.resume-notice p svg { flex-shrink: 0; color: var(--accent); }
+.notice-actions { display: flex; flex-shrink: 0; align-items: center; gap: 6px; }
+.notice-action, .notice-close { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text-muted); font: 13px/1.6 var(--font-body); }
+.notice-action { padding: 6px 10px; }
+.notice-continue { color: var(--accent-strong); }
+.notice-close { width: 44px; padding: 0; }
+.notice-action:hover, .notice-close:hover { color: var(--accent-strong); background: var(--accent-light); }
+.resume-note-enter-active, .resume-note-leave-active { transition: opacity 180ms ease, transform 180ms ease; }
+.resume-note-enter-from, .resume-note-leave-to { opacity: 0; transform: translateY(-4px); }
 .collection-meta { display: inline-flex; align-items: center; gap: 10px; color: var(--text-muted); font: 12px/1.7 var(--font-mono); }
 .phase-wrap { max-width: 920px; margin: 0 auto; }
 .complete-phase { max-width: none; }
@@ -284,13 +381,12 @@ function confirmDesc(type: string) {
 .live-bracket-section { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); }
 .live-bracket-toggle { display: flex; min-height: 46px; align-items: center; justify-content: space-between; gap: 16px; margin: 0 auto; padding: 10px 18px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-muted); font: 14px/1.7 var(--font-body); cursor: pointer; }
 .live-bracket-toggle:hover { border-color: var(--accent); color: var(--accent-strong); }
+.live-bracket-toggle { width: fit-content; list-style: none; }
+.live-bracket-toggle::-webkit-details-marker { display: none; }
 .bracket-toggle-mark { color: var(--accent-strong); font: 19px/1 var(--font-mono); }
+.bracket-toggle-mark::before { content: '+'; }
+.live-bracket-section[open] .bracket-toggle-mark::before { content: '−'; }
 .live-bracket-body { max-height: 420px; overflow-y: auto; margin-top: 24px; }
-.resume-card { max-width: 640px; margin: 16px auto 0; padding: 44px; text-align: center; }
-.resume-icon { display: inline-grid; width: 60px; height: 60px; place-items: center; margin-bottom: 22px; background: var(--accent-light); border-radius: 50%; color: var(--accent-strong); }
-.resume-title { margin: 0 0 13px; color: var(--text); font-family: var(--font-display); font-size: 25px; font-weight: 500; }
-.resume-desc { margin: 0 0 28px; color: var(--text-muted); font-size: 15px; line-height: 1.9; }
-.resume-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .idle-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 38px; padding: 38px 46px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-card); box-shadow: var(--shadow-sm); }
 .record-collection { position: relative; min-height: 280px; }
 .record-sleeve { position: absolute; top: 36px; left: calc(50% - 86px); width: 172px; height: 172px; padding: 5px; border: 1px solid var(--border-strong); border-radius: 5px; background: var(--bg-card); box-shadow: var(--shadow-md); }
@@ -323,6 +419,15 @@ function confirmDesc(type: string) {
 }
 @media (max-width: 640px) {
   .xusong-page { padding-bottom: 20px; }
+  .song-field { inset-block-start: 80px; }
+  .song-ribbon-copy { gap: 18px; padding-right: 18px; }
+  .song-ribbon-copy span { font-size: 19px; line-height: 1.4; }
+  .collection-tools { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; }
+  .motion-toggle { font-size: 11px; padding-inline: 4px; }
+  .resume-notice { flex-wrap: wrap; gap: 0 10px; padding: 10px 12px 4px; margin-bottom: 16px; }
+  .resume-notice p { font-size: 13px; }
+  .notice-actions { margin-left: auto; }
+  .notice-action { font-size: 12px; }
   .collection-meta { font-size: 11px; gap: 7px; }
   .idle-card { grid-template-columns: 1fr; gap: 10px; padding: 16px 18px 20px; }
   .record-collection { min-height: 112px; }
@@ -353,11 +458,6 @@ function confirmDesc(type: string) {
   .live-bracket-section { margin-top: 22px; padding-top: 16px; }
   .live-bracket-toggle { min-height: 44px; padding: 8px 12px; font-size: 13px; }
   .live-bracket-body { margin-top: 16px; }
-  .resume-card { margin-top: 0; padding: 22px 18px; }
-  .resume-icon { width: 44px; height: 44px; margin-bottom: 12px; }
-  .resume-title { margin-bottom: 8px; font-size: 21px; line-height: 1.5; }
-  .resume-desc { margin-bottom: 16px; font-size: 14px; line-height: 1.7; }
-  .resume-actions { gap: 8px; }
   .champion-card { margin-bottom: 22px; }
   .champion-label { margin-bottom: 16px; font-size: 21px; }
   .champion-list { gap: 12px; }
@@ -366,4 +466,5 @@ function confirmDesc(type: string) {
   .xusong-confirm-card { padding: 24px 20px; }
   .xusong-confirm-title { font-size: 21px; }
 }
+@media (prefers-reduced-motion: reduce) { .song-ribbon-track { animation: none; } .resume-note-enter-active, .resume-note-leave-active { transition: none; } }
 </style>

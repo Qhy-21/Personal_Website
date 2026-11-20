@@ -1,60 +1,45 @@
-<script setup>
-import { ref, computed, watch, onUnmounted } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, shallowRef, watch } from 'vue'
 import { useDialog } from '../composables/useDialog'
 
-const props = defineProps({
-  interest: { type: Object, default: null },
-  locale: { type: String, required: true },
-})
-const emit = defineEmits(['close'])
-const modalOpen = computed({
-  get: () => Boolean(props.interest),
-  set: (value) => { if (!value) emit('close') },
-})
+type Interest = { id: string; text: string; textEn?: string }
+const props = defineProps<{ interest: Interest; locale: string }>()
+const emit = defineEmits<{ close: [] }>()
+const modalOpen = computed({ get: () => Boolean(props.interest), set: value => { if (!value) emit('close') } })
 const { dialogRef } = useDialog(modalOpen)
-const carouselPlaying = ref(false)
 
-/* ===== glob auto-discovery ===== */
-const descModules = import.meta.glob('../data/interests/*/desc.md', { query: '?raw', import: 'default', eager: true })
-const descEnModules = import.meta.glob('../data/interests/*/desc.en.md', { query: '?raw', import: 'default', eager: true })
-const imageModules = import.meta.glob('../data/interests/*/*.{jpg,jpeg,png,gif,webp}', { eager: true, import: 'default' })
+// Glob keys are a lightweight index. Each loader is called only when its
+// interest, language, or current carousel image is actually requested.
+const descModules = import.meta.glob<string>('../data/interests/*/desc.md', { query: '?raw', import: 'default' })
+const descEnModules = import.meta.glob<string>('../data/interests/*/desc.en.md', { query: '?raw', import: 'default' })
+const descUrlModules = import.meta.glob<string>('../data/interests/*/desc*.md', { query: '?url', import: 'default' })
+const imageModules = import.meta.glob<string>('../data/interests/*/*.{jpg,jpeg,png,gif,webp}', { import: 'default' })
+const description = shallowRef('')
+const descriptionLoading = shallowRef(false)
+const descriptionError = shallowRef(false)
+const currentPage = shallowRef(0)
+const carouselIdx = shallowRef(0)
+const carouselPlaying = shallowRef(false)
+const imageUrl = shallowRef('')
+const imageLoading = shallowRef(false)
+const imageError = shallowRef(false)
+const imageRetry = shallowRef(0)
+const showSlowHint = shallowRef(false)
+const reducedMotion = shallowRef(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+const images = computed(() => Object.keys(imageModules).filter(path => path.split('/')[3] === props.interest.id))
+const hasCarousel = computed(() => images.value.length > 0)
+const multiImage = computed(() => images.value.length > 1)
+let descriptionVersion = 0
+let imageVersion = 0
+let disposed = false
+let carouselTimer: ReturnType<typeof setTimeout> | undefined
+let slowTimer: ReturnType<typeof setTimeout> | undefined
+let motionPreference: MediaQueryList | undefined
 
-function extractId(path) {
-  return path.split('/')[3]
-}
-
-const descMap = {}
-for (const [path, content] of Object.entries(descModules)) {
-  descMap[extractId(path)] = content
-}
-
-const descEnMap = {}
-for (const [path, content] of Object.entries(descEnModules)) {
-  descEnMap[extractId(path)] = content
-}
-
-const imageMap = {}
-for (const [path, url] of Object.entries(imageModules)) {
-  const id = extractId(path)
-  if (!imageMap[id]) imageMap[id] = []
-  imageMap[id].push(url)
-}
-
-function getDesc(id) {
-  if (props.locale === 'en' && descEnMap[id]) return descEnMap[id]
-  return descMap[id] || ''
-}
-
-function getImages(id) {
-  return imageMap[id] || []
-}
-
-/* ===== helpers ===== */
-function label(item) {
+function label(item: Interest) {
   return props.locale === 'en' && item.textEn ? item.textEn : item.text
 }
-
-function renderMarkdown(md) {
+function renderMarkdown(md: string) {
   if (!md) return ''
   let html = md
   html = html.replace(/^# (.+)$/gm, '<h3 class="imd-h3">$1</h3>')
@@ -63,141 +48,160 @@ function renderMarkdown(md) {
   html = html.replace(/^> (.+)$/gm, '<blockquote class="imd-blockquote">$1</blockquote>')
   html = '<p>' + html.split(/\n\n+/).join('</p><p>') + '</p>'
   html = html.replace(/\n/g, '<br>')
-  html = html.replace(/<p>\s*<\/p>/g, '')
-  return html
+  return html.replace(/<p>\s*<\/p>/g, '')
 }
-
-/* ===== state ===== */
-const currentPage = ref(0)
-const carouselIdx = ref(0)
-let carouselTimer = null
-
 const descPages = computed(() => {
-  if (!props.interest) return ['']
-  const md = getDesc(props.interest.id)
-  const fullHtml = renderMarkdown(md)
+  const fullHtml = renderMarkdown(description.value)
   if (!fullHtml) return ['']
-
   const blocks = fullHtml.split(/(?<=<\/p>|<\/h3>|<\/blockquote>)/)
-  const pages = []
+  const pages: string[] = []
   let current = ''
-  const LIMIT = 420
-  for (const b of blocks) {
-    if (current && current.length + b.length > LIMIT) {
-      pages.push(current)
-      current = b
-    } else {
-      current += b
-    }
+  for (const block of blocks) {
+    if (current && current.length + block.length > 420) { pages.push(current); current = block }
+    else current += block
   }
   if (current) pages.push(current)
   return pages.length ? pages : ['']
 })
-
 const hasPages = computed(() => descPages.value.length > 1)
-const pageLabel = computed(() =>
-  hasPages.value ? `${currentPage.value + 1} / ${descPages.value.length}` : ''
-)
+const pageLabel = computed(() => hasPages.value ? `${currentPage.value + 1} / ${descPages.value.length}` : '')
 
-function goPage(delta) {
-  const n = currentPage.value + delta
-  if (n >= 0 && n < descPages.value.length) {
-    currentPage.value = n
+async function loadDescription() {
+  const version = ++descriptionVersion
+  const retrying = descriptionError.value
+  currentPage.value = 0
+  description.value = ''
+  descriptionError.value = false
+  descriptionLoading.value = true
+  const root = '../data/interests/' + props.interest.id + '/'
+  const path = props.locale === 'en' && descEnModules[root + 'desc.en.md'] ? root + 'desc.en.md' : root + 'desc.md'
+  const loader = props.locale === 'en' && path.endsWith('desc.en.md') ? descEnModules[path] : descModules[path]
+  try {
+    if (!loader) throw new Error('Missing interest description')
+    let content: string
+    if (retrying) {
+      // A failed dynamic import may stay cached by the browser. The asset URL
+      // loader gives an independent, retryable request without reloading Home.
+      const urlLoader = descUrlModules[path]
+      if (!urlLoader) throw new Error('Missing interest description asset')
+      const response = await fetch(await urlLoader(), { cache: 'reload' })
+      if (!response.ok) throw new Error('Interest description unavailable')
+      content = await response.text()
+    } else content = await loader()
+    if (!disposed && version === descriptionVersion) description.value = content
+  } catch {
+    if (!disposed && version === descriptionVersion) descriptionError.value = true
+  } finally {
+    if (!disposed && version === descriptionVersion) descriptionLoading.value = false
   }
 }
-
-/* ===== carousel ===== */
-const images = computed(() =>
-  props.interest ? getImages(props.interest.id) : []
-)
-
-const hasCarousel = computed(() => images.value.length > 0)
-const multiImage = computed(() => images.value.length > 1)
-
-const imgLoaded = ref(new Set())
-const slowTimer = ref(null)
-const showSlowHint = ref(false)
-
-function onImgLoad(idx) {
-  imgLoaded.value = new Set([...imgLoaded.value, idx])
+function goPage(delta: number) {
+  const next = currentPage.value + delta
+  if (next >= 0 && next < descPages.value.length) currentPage.value = next
 }
-
-function onImgError(idx) {
-  imgLoaded.value = new Set([...imgLoaded.value, idx])
+function clearCarouselTimer() {
+  clearTimeout(carouselTimer)
+  carouselTimer = undefined
 }
-
+function scheduleCarousel() {
+  clearCarouselTimer()
+  if (carouselPlaying.value && !imageLoading.value && !imageError.value && !document.hidden && !reducedMotion.value) {
+    carouselTimer = setTimeout(() => gotoImage((carouselIdx.value + 1) % images.value.length), 3500)
+  }
+}
 function startCarousel() {
-  stopCarousel()
-  if (images.value.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    carouselPlaying.value = true
-    carouselTimer = setInterval(() => {
-      carouselIdx.value = (carouselIdx.value + 1) % images.value.length
-    }, 3500)
-  }
+  if (!multiImage.value || reducedMotion.value) return
+  carouselPlaying.value = true
+  scheduleCarousel()
 }
-
 function stopCarousel() {
-  if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null }
+  clearCarouselTimer()
   carouselPlaying.value = false
 }
-
-function gotoImage(idx) {
-  const wasPlaying = carouselPlaying.value
-  stopCarousel()
-  carouselIdx.value = idx
-  if (wasPlaying) startCarousel()
+function gotoImage(index: number) {
+  if (index < 0 || index >= images.value.length) return
+  clearCarouselTimer()
+  if (carouselIdx.value === index) { scheduleCarousel(); return }
+  carouselIdx.value = index
 }
-
-/* ===== touch swipe ===== */
+async function loadCurrentImage() {
+  const version = ++imageVersion
+  clearCarouselTimer()
+  clearTimeout(slowTimer)
+  imageUrl.value = ''
+  imageError.value = false
+  showSlowHint.value = false
+  const path = images.value[carouselIdx.value]
+  imageLoading.value = Boolean(path)
+  if (!path) return
+  slowTimer = setTimeout(() => { if (version === imageVersion && imageLoading.value) showSlowHint.value = true }, 2000)
+  try {
+    const url = await imageModules[path]()
+    if (!disposed && version === imageVersion) imageUrl.value = url
+  } catch {
+    if (!disposed && version === imageVersion) onImgError()
+  }
+}
+function onImgLoad() {
+  imageLoading.value = false
+  showSlowHint.value = false
+  clearTimeout(slowTimer)
+  scheduleCarousel()
+}
+function onImgError() {
+  imageLoading.value = false
+  imageError.value = true
+  showSlowHint.value = false
+  clearTimeout(slowTimer)
+  stopCarousel()
+}
+function retryImage() {
+  imageRetry.value++
+  loadCurrentImage()
+}
 let touchStartX = 0
 let touchStartY = 0
-
-function onTouchStart(e) {
-  touchStartX = e.touches[0].clientX
-  touchStartY = e.touches[0].clientY
+function onTouchStart(event: TouchEvent) {
+  touchStartX = event.touches[0].clientX
+  touchStartY = event.touches[0].clientY
 }
-
-function onTouchEnd(e) {
-  if (!props.interest || !multiImage.value) return
-  const dx = e.changedTouches[0].clientX - touchStartX
-  const dy = e.changedTouches[0].clientY - touchStartY
+function onTouchEnd(event: TouchEvent) {
+  if (!multiImage.value) return
+  const dx = event.changedTouches[0].clientX - touchStartX
+  const dy = event.changedTouches[0].clientY - touchStartY
   if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-    e.preventDefault()
-    if (dx > 0) {
-      gotoImage((carouselIdx.value - 1 + images.value.length) % images.value.length)
-    } else {
-      gotoImage((carouselIdx.value + 1) % images.value.length)
-    }
+    event.preventDefault()
+    gotoImage((carouselIdx.value + (dx > 0 ? -1 : 1) + images.value.length) % images.value.length)
   }
 }
-
-/* ===== init / reset ===== */
-watch(() => props.interest, (item) => {
+function onVisibilityChange() {
+  if (document.hidden) clearCarouselTimer()
+  else scheduleCarousel()
+}
+function onMotionChange() {
+  reducedMotion.value = motionPreference?.matches ?? false
+  if (reducedMotion.value) stopCarousel()
+}
+watch(() => [props.interest.id, props.locale], loadDescription, { immediate: true })
+watch(() => props.interest.id, () => {
   stopCarousel()
-  currentPage.value = 0
   carouselIdx.value = 0
-  imgLoaded.value = new Set()
-  showSlowHint.value = false
-  clearTimeout(slowTimer.value)
-  if (item) {
-    slowTimer.value = setTimeout(() => {
-      const imgs = getImages(item.id)
-      if (imgs.length > 0 && imgLoaded.value.size < imgs.length) {
-        showSlowHint.value = true
-      }
-    }, 2000)
-    if (getImages(item.id).length > 1) startCarousel()
-    else stopCarousel()
-  }
+  if (multiImage.value && !reducedMotion.value) carouselPlaying.value = true
+}, { immediate: true })
+watch(() => [props.interest.id, carouselIdx.value], loadCurrentImage, { immediate: true })
+onMounted(() => {
+  motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+  motionPreference.addEventListener('change', onMotionChange)
+  document.addEventListener('visibilitychange', onVisibilityChange)
 })
-
-watch(() => props.interest ? getDesc(props.interest.id) : null, () => {
-  currentPage.value = 0
-})
-
 onUnmounted(() => {
+  disposed = true
+  descriptionVersion++
+  imageVersion++
   stopCarousel()
-  clearTimeout(slowTimer.value)
+  clearTimeout(slowTimer)
+  motionPreference?.removeEventListener('change', onMotionChange)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
 })
 </script>
 
@@ -205,25 +209,26 @@ onUnmounted(() => {
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="interest" class="interest-modal" @click.self="emit('close')">
-        <div ref="dialogRef" class="interest-modal-inner" role="dialog" aria-modal="true" aria-labelledby="interest-title" tabindex="-1">
+        <div ref="dialogRef" class="interest-modal-inner" role="dialog" aria-modal="true" aria-labelledby="interest-title" :aria-busy="descriptionLoading" tabindex="-1">
           <button type="button" class="interest-close" @click="emit('close')" :aria-label="locale === 'en' ? 'Close' : '关闭'">&times;</button>
 
           <!-- Carousel -->
           <div v-if="hasCarousel" class="carousel" @touchstart="onTouchStart" @touchend="onTouchEnd">
             <div class="carousel-track">
               <img
-                v-for="(img, idx) in images"
-                :key="idx"
-                :src="img"
+                v-if="imageUrl && !imageError"
+                :key="imageUrl + imageRetry"
+                :src="imageUrl"
                 :alt="label(interest)"
-                class="carousel-img"
-                :class="{ active: idx === carouselIdx }"
-                loading="lazy"
-                @load="onImgLoad(idx)"
-                @error="onImgError(idx)"
+                class="carousel-img active"
+                decoding="async"
+                @load="onImgLoad"
+                @error="onImgError"
               >
+              <div v-if="imageLoading" class="carousel-state" role="status">{{ locale === 'en' ? 'Loading image…' : '正在加载图片…' }}</div>
+              <div v-else-if="imageError" class="carousel-state" role="alert"><span>{{ locale === 'en' ? 'This image could not be loaded.' : '这张图片未能加载。' }}</span><button type="button" class="media-retry" @click="retryImage">{{ locale === 'en' ? 'Try again' : '重试' }}</button></div>
             </div>
-            <div v-if="showSlowHint && imgLoaded.size < images.length" class="carousel-slow-hint">
+            <div v-if="showSlowHint && imageLoading" class="carousel-slow-hint">
               {{ $t('home.interestSlowHint') }}
             </div>
             <button v-if="multiImage" type="button" class="carousel-btn carousel-prev"
@@ -234,12 +239,14 @@ onUnmounted(() => {
               <button v-for="(_, idx) in images" :key="idx" type="button" class="carousel-dot"
                 :class="{ active: idx === carouselIdx }" :aria-label="locale === 'en' ? `Show image ${idx + 1}` : `查看第 ${idx + 1} 张图片`" :aria-pressed="idx === carouselIdx" @click="gotoImage(idx)"></button>
             </div>
-            <button v-if="multiImage" type="button" class="carousel-play" @click="carouselPlaying ? stopCarousel() : startCarousel()">{{ locale === 'en' ? (carouselPlaying ? 'Pause slideshow' : 'Play slideshow') : (carouselPlaying ? '暂停轮播' : '自动轮播') }}</button>
+            <button v-if="multiImage" type="button" class="carousel-play" :disabled="reducedMotion" :aria-pressed="carouselPlaying" @click="carouselPlaying ? stopCarousel() : startCarousel()">{{ reducedMotion ? (locale === 'en' ? 'Slideshow paused: reduced motion' : '已按减少动态效果暂停轮播') : locale === 'en' ? (carouselPlaying ? 'Pause slideshow' : 'Play slideshow') : (carouselPlaying ? '暂停轮播' : '自动轮播') }}</button>
           </div>
 
           <h2 id="interest-title" class="interest-modal-title">{{ label(interest) }}</h2>
 
-          <div class="interest-modal-body" v-html="descPages[currentPage] || ''"></div>
+          <p v-if="descriptionLoading" class="interest-load-message" role="status">{{ locale === 'en' ? 'Loading details…' : '正在加载详情…' }}</p>
+          <div v-else-if="descriptionError" class="interest-load-message" role="alert"><p>{{ locale === 'en' ? 'The details could not be loaded.' : '详情未能加载。' }}</p><button type="button" class="media-retry" @click="loadDescription">{{ locale === 'en' ? 'Try again' : '重试' }}</button></div>
+          <div v-else class="interest-modal-body" v-html="descPages[currentPage] || ''"></div>
 
           <div v-if="hasPages" class="pagination-bar">
             <button type="button" class="page-btn" :disabled="currentPage === 0" :aria-label="locale === 'en' ? 'Previous page' : '上一页'" @click="goPage(-1)">&laquo;</button>
@@ -265,7 +272,6 @@ onUnmounted(() => {
   max-width: min(520px, 92vw); width: 100%; max-height: 88vh;
   overflow-y: auto;
   background: var(--bg-elevated);
-  backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   padding: 64px 28px 28px;
@@ -308,6 +314,9 @@ onUnmounted(() => {
   transition: opacity 0.5s var(--ease-out);
 }
 .carousel-img.active { opacity: 1; }
+.carousel-state { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; padding: 16px 52px; color: var(--text-muted); background: var(--bg-elevated); text-align: center; font-size: 13px; }
+.media-retry { min-height: 44px; padding: 8px 16px; color: var(--accent); background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); }
+.interest-load-message { color: var(--text-muted); font-size: 14px; line-height: 1.8; }
 
 .carousel-btn {
   position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
@@ -323,14 +332,16 @@ onUnmounted(() => {
 .carousel-prev { left: 8px; }
 .carousel-next { right: 8px; }
 
-.carousel-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; padding: 4px 8px 0; }
+.carousel-dots { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px; padding: 0 8px; }
 .carousel-dot {
-  width: 44px; height: 44px; padding: 18px; border: none;
+  display: grid; place-items: center; width: 28px; height: 32px; padding: 0; border: none;
   background: transparent; cursor: pointer;
 }
-.carousel-dot::before { display: block; content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
-.carousel-dot.active::before, .carousel-dot:hover::before { background: var(--accent); }
+.carousel-dot::before { display: block; content: ''; width: 4px; height: 4px; border-radius: 4px; background: var(--text-muted); transition: width var(--duration-fast) ease, background var(--duration-fast) ease; }
+.carousel-dot.active::before { width: 12px; height: 5px; background: var(--accent); }
+.carousel-dot:hover::before { background: var(--accent); }
 .carousel-play { display: block; min-height: 44px; margin: 0 auto; padding: 4px 16px; background: transparent; border: 0; color: var(--accent); font-size: 12px; }
+.carousel-play:disabled { color: var(--text-muted); cursor: default; }
 
 .carousel-slow-hint {
   position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
